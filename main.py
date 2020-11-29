@@ -191,6 +191,8 @@ def main():
             sys.stdout.write(position.__repr__() + "\n")
             sys.stdout.flush()
 
+        elif msg.startswith("ucinewgame"):
+            position = chess.Board()
         elif msg.startswith("position"):
             msg = msg.replace("position", "").strip()
 

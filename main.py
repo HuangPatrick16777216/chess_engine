@@ -117,18 +117,30 @@ class Tree:
         self.init_vars()
         self.root = Node(self, kwargs["position"], 0)
         
-        #threading.Thread(target=self.periodic_printer).start()
+        threading.Thread(target=self.periodic_printer).start()
+        total_depth = 99
         if "depth" in kwargs:
-            for depth in range(kwargs["depth"]+1):
-                self.curr_depth = depth
-                self.print_info()
-                self.root.gen_branches(depth)
-                if not self.active:
-                    break
+            total_depth = kwargs["depth"] + 1
+        elif "nodes" in kwargs:
+            threading.Thread(target=self.timer_nodes, args=(kwargs["nodes"],)).start()
+            total_depth = 99
+
+        for depth in range(total_depth):
+            self.curr_depth = depth
+            self.print_info()
+            self.root.gen_branches(depth)
+            if not self.active:
+                break
         
         self.print_info()
         self.active = False
+        time.sleep(0.05)
         self.print_best_move()
+
+    def timer_nodes(self, nodes):
+        while self.nodes < nodes:
+            time.sleep(0.01)
+        self.active = False
 
     def periodic_printer(self):
         base = 2500
@@ -150,8 +162,9 @@ class Tree:
         curr_time = time.time()
         info_str = self.info_str.format(depth=self.curr_depth, score=self.curr_score, nodes=self.nodes, nps=int(self.nodes/(curr_time-self.time_start+0.01)),
             time=int((curr_time-self.time_start)*1000), moves=self.curr_move)
-        sys.stdout.write(info_str + "\n")
-        sys.stdout.flush()
+        if self.active:
+            sys.stdout.write(info_str + "\n")
+            sys.stdout.flush()
 
     def print_best_move(self):
         sys.stdout.write(f"bestmove {self.curr_move.uci()}\n")
@@ -194,7 +207,19 @@ def main():
                 position = chess.Board(fen)
 
         elif msg.startswith("go"):
-            threading.Thread(target=tree.search, kwargs={"position": position, "depth": 3}).start()
+            msg = msg.replace("go", "").strip()
+            kwargs = {"position": position}
+
+            if msg.startswith("depth"):
+                depth = int(msg.replace("depth", "").strip())
+                kwargs["depth"] = depth
+            elif msg.startswith("nodes"):
+                nodes = int(msg.replace("nodes", "").strip())
+                kwargs["nodes"] = nodes
+            else:
+                kwargs["depth"] = 99
+
+            threading.Thread(target=tree.search, kwargs=kwargs).start()
         elif msg == "stop":
             tree.active = False
 

@@ -23,7 +23,7 @@ from copy import deepcopy
 
 
 class Node:
-    def __init__(self, root, position, depth):
+    def __init__(self, root, position: chess.Board, depth):
         self.root = root
         self.position = position
         self.depth = depth
@@ -85,10 +85,24 @@ class Node:
     def evaluate(self):
         if self.evaluation is not None:
             return self.evaluation
+
+        if self.position.is_game_over():
+            result = self.position.result()
+            if result == "1-0":
+                score = 16777216 * (self.depth+1)
+                self.evaluation = score
+                return score
+            elif result == "0-1":
+                score = -16777216 * (self.depth+1)
+                self.evaluation = score
+                return score
+            elif result == "1/2-1/2":
+                self.evaluation = 0
+                return 0
         
         mat_weight = 1
 
-        # Material, more aspects added later
+        # Material
         material = 0
         pieces = self.position.fen()
         material += pieces.count("P") - pieces.count("p")
@@ -98,8 +112,9 @@ class Node:
         material += 9 * (pieces.count("Q") - pieces.count("q"))
 
         score = material*mat_weight
+        score *= 100
         self.evaluation = score
-        return 100 * score
+        return score
 
 
 class Tree:

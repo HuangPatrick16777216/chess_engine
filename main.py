@@ -57,10 +57,11 @@ class Node:
                 max_eval = float("-inf")
                 best_move = None
                 for branch in self.branches:
-                    curr_eval = branch.minimax()
-                    if curr_eval[0] > max_eval:
-                        max_eval = curr_eval[0]
-                        best_move = curr_eval[1]
+                    curr_eval = branch.minimax()[0]
+                    if curr_eval > max_eval:
+                        max_eval = curr_eval
+                        if self.depth == 0:
+                            best_move = branch.position.peek()
 
                 return (max_eval, best_move)
 
@@ -68,10 +69,11 @@ class Node:
                 min_eval = float("inf")
                 best_move = None
                 for branch in self.branches:
-                    curr_eval = branch.minimax()
-                    if curr_eval[0] < min_eval:
-                        min_eval = curr_eval[0]
-                        best_move = curr_eval[1]
+                    curr_eval = branch.minimax()[0]
+                    if curr_eval < min_eval:
+                        min_eval = curr_eval
+                        if self.depth == 0:
+                            best_move = branch.position.peek()
 
                 return (min_eval, best_move)
     
@@ -133,12 +135,12 @@ class Tree:
                 if not self.active:
                     return
             
-            self.print_info()
+            threading.Thread(target=self.print_info).start()
             curr_mult += 1
             base += base_inc
 
     def print_info(self):
-        #self.curr_move = self.root.minimax()[1]
+        self.curr_move = self.root.minimax()[1]
         curr_time = time.time()
         info_str = self.info_str.format(depth=self.curr_depth, score=self.curr_score, nodes=self.nodes, nps=int(self.nodes/(curr_time-self.time_start+0.01)),
             time=int((curr_time-self.time_start)*1000), moves=self.curr_move)
@@ -156,6 +158,7 @@ def main():
         msg = input().strip()
 
         if msg == "quit":
+            tree.active = False
             return
         elif msg == "isready":
             print("readyok")

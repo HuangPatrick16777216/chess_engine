@@ -99,7 +99,7 @@ class Node:
 
         score = material*mat_weight
         self.evaluation = score
-        return score
+        return 100 * score
 
 
 class Tree:
@@ -157,7 +157,7 @@ class Tree:
         self.active = False
 
     def periodic_printer(self):
-        base = 2500
+        base = 15000
         base_inc = 125
         curr_mult = 0
         while self.active:
@@ -172,7 +172,9 @@ class Tree:
             base += base_inc
 
     def print_info(self):
-        self.curr_move = self.root.minimax()[1]
+        eval_info = self.root.minimax()
+        self.curr_score = eval_info[0]
+        self.curr_move = eval_info[1]
         curr_time = time.time()
         info_str = self.info_str.format(depth=self.curr_depth, score=self.curr_score, nodes=self.nodes, nps=int(self.nodes/(curr_time-self.time_start+0.01)),
             time=int((curr_time-self.time_start)*1000), moves=self.curr_move)

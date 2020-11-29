@@ -123,10 +123,11 @@ class Tree:
             total_depth = kwargs["depth"] + 1
         elif "nodes" in kwargs:
             threading.Thread(target=self.timer_nodes, args=(kwargs["nodes"],)).start()
-            total_depth = 99
         elif "time" in kwargs:
             threading.Thread(target=self.timer_time, args=(kwargs["time"],)).start()
-            total_depth = 99
+        elif "wtime" in kwargs or "btime" in kwargs:
+            total_time = self.calc_optimal_time(kwargs)
+            threading.Thread(target=self.timer_time, args=(total_time,)).start()
 
         for depth in range(total_depth):
             self.curr_depth = depth
@@ -139,6 +140,10 @@ class Tree:
         self.active = False
         time.sleep(0.05)
         self.print_best_move()
+
+    def calc_optimal_time(self, time_info):
+        # todo calculate
+        return 10
 
     def timer_nodes(self, nodes):
         while self.nodes < nodes:
@@ -225,6 +230,10 @@ def main():
             elif msg.startswith("movetime"):
                 time = int(msg.replace("movetime", "").strip()) / 1000
                 kwargs["time"] = time
+            elif ("wtime" in msg and position.turn) or ("btime" in msg and not position.turn):
+                parts = msg.split(" ")
+                for i in range(0, len(parts)//2):
+                    kwargs[parts[i*2]] = int(parts[i*2+1]) / 1000
             else:
                 kwargs["depth"] = 99
 

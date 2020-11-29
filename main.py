@@ -46,6 +46,35 @@ class Node:
                 if not self.root.active:
                     return
 
+    def minimax(self):
+        if len(self.branches) == 0:
+            if len(self.position.move_stack) == 0:
+                return (self.evaluate(), None)
+            else:
+                return (self.evaluate(), self.position.peek())
+        else:
+            if self.position.turn:
+                max_eval = float("-inf")
+                best_move = None
+                for branch in self.branches:
+                    curr_eval = branch.minimax()
+                    if curr_eval[0] > max_eval:
+                        max_eval = curr_eval[0]
+                        best_move = curr_eval[1]
+
+                return (max_eval, best_move)
+
+            else:
+                min_eval = float("inf")
+                best_move = None
+                for branch in self.branches:
+                    curr_eval = branch.minimax()
+                    if curr_eval[0] < min_eval:
+                        min_eval = curr_eval[0]
+                        best_move = curr_eval[1]
+
+                return (min_eval, best_move)
+    
     def evaluate(self):
         if self.evaluation is not None:
             return self.evaluation
@@ -91,7 +120,7 @@ class Tree:
                     break
         
         self.print_info()
-        #self.print_best_move()
+        self.print_best_move()
 
     def periodic_printer(self):
         base = 1000
@@ -109,10 +138,14 @@ class Tree:
             base += base_inc
 
     def print_info(self):
+        #self.curr_move = self.root.minimax()[1]
         curr_time = time.time()
         info_str = self.info_str.format(depth=self.curr_depth, score=self.curr_score, nodes=self.nodes, nps=int(self.nodes/(curr_time-self.time_start+0.01)),
             time=int((curr_time-self.time_start)*1000), moves=self.curr_move)
         print(info_str)
+
+    def print_best_move(self):
+        print(f"bestmove {self.curr_move.uci()}")
 
 
 def main():

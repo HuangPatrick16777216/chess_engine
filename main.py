@@ -98,18 +98,47 @@ class Node:
                 self.evaluation = 0
                 return 0
         
+        # Weights
         mat_weight = 1
+        center_weight = 0.2
+
+        # General info
+        pieces = self.position.fen()
+        pieces_remaining = {
+            "P": pieces.count("P"), "p": pieces.count("p"),
+            "N": pieces.count("N"), "n": pieces.count("n"),
+            "B": pieces.count("B"), "b": pieces.count("b"),
+            "R": pieces.count("R"), "r": pieces.count("r"),
+            "Q": pieces.count("Q"), "q": pieces.count("q")
+        }
+        total_pieces_remaining = sum([pieces_remaining[key] for key in pieces_remaining])
 
         # Material
         material = 0
-        pieces = self.position.fen()
-        material += pieces.count("P") - pieces.count("p")
-        material += 3 * (pieces.count("N") - pieces.count("n"))
-        material += 3 * (pieces.count("B") - pieces.count("b"))
-        material += 5 * (pieces.count("R") - pieces.count("r"))
-        material += 9 * (pieces.count("Q") - pieces.count("q"))
+        material += pieces_remaining["P"] - pieces_remaining["p"]
+        material += 3 * (pieces_remaining["N"] - pieces_remaining["n"])
+        material += 3 * (pieces_remaining["B"] - pieces_remaining["b"])
+        material += 5 * (pieces_remaining["R"] - pieces_remaining["r"])
+        material += 9 * (pieces_remaining["Q"] - pieces_remaining["q"])
 
-        score = material*mat_weight
+        # Center control
+        inner_squares = ("D4", "D5", "E4", "E5")
+        outer_squares = ("C3", "D3", "E3", "F3", "F4", "F5", "F6", "E6", "D6", "C6", "C5", "C4")
+        inner_score = 0
+        outer_score = 0
+
+        for sq in inner_squares:
+            inner_score += len(self.position.attackers(chess.WHITE, getattr(chess, sq)))
+            inner_score -= len(self.position.attackers(chess.BLACK, getattr(chess, sq)))
+        for sq in outer_squares:
+            outer_score += len(self.position.attackers(chess.WHITE, getattr(chess, sq)))
+            outer_score -= len(self.position.attackers(chess.BLACK, getattr(chess, sq)))
+
+        inner_score /= total_pieces_remaining
+        outer_score /= total_pieces_remaining
+        center_score = inner_score + outer_score/4
+
+        score = material*mat_weight + center_score*center_weight
         score *= 100
         self.evaluation = score
         return score
@@ -192,7 +221,7 @@ class Tree:
         elif self.curr_score == float("-inf"):
             self.curr_score = "mate -1"
         else:
-            self.curr_score = f"cp {self.curr_score}"
+            self.curr_score = f"cp {int(self.curr_score)}"
 
         self.curr_move = eval_info[1]
         curr_time = time.time()

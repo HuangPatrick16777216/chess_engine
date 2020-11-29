@@ -15,6 +15,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import time
+import threading
 import chess
 from copy import deepcopy
 
@@ -44,20 +46,58 @@ class Node:
                     return
 
 
-class Root:
-    def search(self, position, **kwargs):
-        self.active = True
-        self.root = Node(self, position, 0)
+class Tree:
+    info_str = "info depth {depth} seldepth {depth} multipv 1 score cp {score} nodes {nodes} nps {nps} tbhits 0 time {time} pv {moves}"
 
+    def init_vars(self):
+        self.curr_depth = 0
+        self.curr_score = 0
+        self.nodes = 0
+        self.curr_move = None
+        self.time_start = time.time()
+
+    def search(self, **kwargs):
+        self.active = True
+        self.init_vars()
+        self.root = Node(self, kwargs["position"], 0)
+        
+        threading.Thread(target=self.periodic_printer).start()
         if "depth" in kwargs:
-            for depth in range(kwargs["depth"]):
+            for depth in range(kwargs["depth"]+1):
+                self.curr_depth = depth
+                self.print_info()
                 self.root.gen_branches(depth)
                 if not self.active:
                     break
+        
+        self.print_info()
+        #self.print_best_move()
+
+    def periodic_printer(self):
+        base = 1000
+        base_inc = 125
+        curr_mult = 0
+        while self.active:
+            next_val = curr_mult * base
+            while self.nodes < next_val:
+                time.sleep(0.01)
+                if not self.active:
+                    return
+            
+            self.print_info()
+            curr_mult += 1
+            base += base_inc
+
+    def print_info(self):
+        curr_time = time.time()
+        info_str = self.info_str.format(depth=self.curr_depth, score=self.curr_score, nodes=self.nodes, nps=int(self.nodes/(curr_time-self.time_start+0.01)),
+            time=int((curr_time-self.time_start)*1000), moves=self.curr_move)
+        print(info_str)
 
 
 def main():
     position = chess.Board()
+    tree = Tree()
 
     while True:
         msg = input().strip()
@@ -85,6 +125,11 @@ def main():
             elif msg.startswith("fen"):
                 fen = msg.replace("fen", "").strip()
                 position = chess.Board(fen)
+
+        elif msg.startswith("go"):
+            threading.Thread(target=tree.search, kwargs={"position": position, "depth": 5}).start()
+        elif msg == "stop":
+            tree.active = False
 
 
 main()

@@ -163,12 +163,10 @@ class Tree:
         info_str = self.info_str.format(depth=self.curr_depth, score=self.curr_score, nodes=self.nodes, nps=int(self.nodes/(curr_time-self.time_start+0.01)),
             time=int((curr_time-self.time_start)*1000), moves=self.curr_move)
         if self.active:
-            sys.stdout.write(info_str + "\n")
-            sys.stdout.flush()
+            print(info_str, flush=True)
 
     def print_best_move(self):
-        sys.stdout.write(f"bestmove {self.curr_move.uci()}\n")
-        sys.stdout.flush()
+        print(f"bestmove {self.curr_move.uci()}", flush=True)
 
 
 def main():
@@ -182,14 +180,11 @@ def main():
             tree.active = False
             return
         elif msg == "isready":
-            sys.stdout.write("readyok\n")
-            sys.stdout.flush()
+            print("readyok", flush=True)
         elif msg == "uci":
-            sys.stdout.write("uciok\n")
-            sys.stdout.flush()
+            print("uciok", flush=True)
         elif msg == "d":
-            sys.stdout.write(position.__repr__() + "\n")
-            sys.stdout.flush()
+            print(position, flush=True)
 
         elif msg.startswith("ucinewgame"):
             position = chess.Board()

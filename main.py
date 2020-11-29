@@ -27,6 +27,7 @@ class Node:
         self.position = position
         self.depth = depth
         
+        self.evaluation = None
         self.branches = []
         root.nodes += 1
 
@@ -44,6 +45,25 @@ class Node:
                 branch.gen_branches(target_depth)
                 if not self.root.active:
                     return
+
+    def evaluate(self):
+        if self.evaluation is not None:
+            return self.evaluation
+        
+        mat_weight = 1
+
+        # Material, more aspects added later
+        material = 0
+        pieces = self.position.fen()
+        material += pieces.count("P") - pieces.count("p")
+        material += 3 * (pieces.count("N") - pieces.count("n"))
+        material += 3 * (pieces.count("B") - pieces.count("b"))
+        material += 5 * (pieces.count("R") - pieces.count("r"))
+        material += 9 * (pieces.count("Q") - pieces.count("q"))
+
+        score = material*mat_weight
+        self.evaluation = score
+        return score
 
 
 class Tree:

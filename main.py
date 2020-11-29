@@ -124,6 +124,9 @@ class Tree:
         elif "nodes" in kwargs:
             threading.Thread(target=self.timer_nodes, args=(kwargs["nodes"],)).start()
             total_depth = 99
+        elif "time" in kwargs:
+            threading.Thread(target=self.timer_time, args=(kwargs["time"],)).start()
+            total_depth = 99
 
         for depth in range(total_depth):
             self.curr_depth = depth
@@ -139,6 +142,12 @@ class Tree:
 
     def timer_nodes(self, nodes):
         while self.nodes < nodes:
+            time.sleep(0.01)
+        self.active = False
+
+    def timer_time(self, total_time):
+        time_end = time.time() + total_time
+        while time.time() < time_end:
             time.sleep(0.01)
         self.active = False
 
@@ -213,6 +222,9 @@ def main():
             elif msg.startswith("nodes"):
                 nodes = int(msg.replace("nodes", "").strip())
                 kwargs["nodes"] = nodes
+            elif msg.startswith("movetime"):
+                time = int(msg.replace("movetime", "").strip()) / 1000
+                kwargs["time"] = time
             else:
                 kwargs["depth"] = 99
 

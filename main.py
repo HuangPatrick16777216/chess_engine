@@ -15,6 +15,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import sys
 import time
 import threading
 import chess
@@ -116,7 +117,7 @@ class Tree:
         self.init_vars()
         self.root = Node(self, kwargs["position"], 0)
         
-        threading.Thread(target=self.periodic_printer).start()
+        #threading.Thread(target=self.periodic_printer).start()
         if "depth" in kwargs:
             for depth in range(kwargs["depth"]+1):
                 self.curr_depth = depth
@@ -126,6 +127,7 @@ class Tree:
                     break
         
         self.print_info()
+        self.active = False
         self.print_best_move()
 
     def periodic_printer(self):
@@ -148,10 +150,12 @@ class Tree:
         curr_time = time.time()
         info_str = self.info_str.format(depth=self.curr_depth, score=self.curr_score, nodes=self.nodes, nps=int(self.nodes/(curr_time-self.time_start+0.01)),
             time=int((curr_time-self.time_start)*1000), moves=self.curr_move)
-        print(info_str)
+        sys.stdout.write(info_str + "\n")
+        sys.stdout.flush()
 
     def print_best_move(self):
-        print(f"bestmove {self.curr_move.uci()}")
+        sys.stdout.write(f"bestmove {self.curr_move.uci()}\n")
+        sys.stdout.flush()
 
 
 def main():
@@ -165,11 +169,14 @@ def main():
             tree.active = False
             return
         elif msg == "isready":
-            print("readyok")
+            sys.stdout.write("readyok\n")
+            sys.stdout.flush()
         elif msg == "uci":
-            print("uciok")
+            sys.stdout.write("uciok\n")
+            sys.stdout.flush()
         elif msg == "d":
-            print(position)
+            sys.stdout.write(position.__repr__() + "\n")
+            sys.stdout.flush()
 
         elif msg.startswith("position"):
             msg = msg.replace("position", "").strip()
@@ -187,7 +194,7 @@ def main():
                 position = chess.Board(fen)
 
         elif msg.startswith("go"):
-            threading.Thread(target=tree.search, kwargs={"position": position, "depth": 5}).start()
+            threading.Thread(target=tree.search, kwargs={"position": position, "depth": 3}).start()
         elif msg == "stop":
             tree.active = False
 

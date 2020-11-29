@@ -62,6 +62,8 @@ class Node:
                         max_eval = curr_eval
                         if self.depth == 0:
                             best_move = branch.position.peek()
+                    if not self.root.active:
+                        break
 
                 return (max_eval, best_move)
 
@@ -74,6 +76,8 @@ class Node:
                         min_eval = curr_eval
                         if self.depth == 0:
                             best_move = branch.position.peek()
+                    if not self.root.active:
+                        break
 
                 return (min_eval, best_move)
     
@@ -125,7 +129,7 @@ class Tree:
         self.print_best_move()
 
     def periodic_printer(self):
-        base = 1000
+        base = 2500
         base_inc = 125
         curr_mult = 0
         while self.active:

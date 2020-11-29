@@ -89,13 +89,11 @@ class Node:
         if self.position.is_game_over():
             result = self.position.result()
             if result == "1-0":
-                score = 16777216 * (self.depth+1)
-                self.evaluation = score
-                return score
+                self.evaluation = float("inf")
+                return float("inf")
             elif result == "0-1":
-                score = -16777216 * (self.depth+1)
-                self.evaluation = score
-                return score
+                self.evaluation = float("-inf")
+                return float("-inf")
             elif result == "1/2-1/2":
                 self.evaluation = 0
                 return 0
@@ -118,7 +116,7 @@ class Node:
 
 
 class Tree:
-    info_str = "info depth {depth} seldepth {depth} multipv 1 score cp {score} nodes {nodes} nps {nps} tbhits 0 time {time} pv {moves}"
+    info_str = "info depth {depth} seldepth {depth} multipv 1 score {score} nodes {nodes} nps {nps} tbhits 0 time {time} pv {moves}"
 
     def init_vars(self):
         self.curr_depth = 0
@@ -172,7 +170,7 @@ class Tree:
         self.active = False
 
     def periodic_printer(self):
-        base = 15000
+        base = 5000
         base_inc = 125
         curr_mult = 0
         while self.active:
@@ -189,6 +187,13 @@ class Tree:
     def print_info(self):
         eval_info = self.root.minimax()
         self.curr_score = eval_info[0]
+        if self.curr_score == float("inf"):
+            self.curr_score = "mate 1"
+        elif self.curr_score == float("-inf"):
+            self.curr_score = "mate -1"
+        else:
+            self.curr_score = f"cp {self.curr_score}"
+
         self.curr_move = eval_info[1]
         curr_time = time.time()
         info_str = self.info_str.format(depth=self.curr_depth, score=self.curr_score, nodes=self.nodes, nps=int(self.nodes/(curr_time-self.time_start+0.01)),

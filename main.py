@@ -16,6 +16,44 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import chess
+from copy import deepcopy
+
+
+class Node:
+    def __init__(self, root, position, depth):
+        self.root = root
+        self.position = position
+        self.depth = depth
+        
+        self.branches = []
+        root.nodes += 1
+
+    def gen_branches(self, target_depth):
+        if target_depth == self.depth + 1:
+            for move in self.position.generate_legal_moves():
+                new_board = deepcopy(self.position)
+                new_board.push(move)
+                self.branches.append(Node(self.root, new_board, self.depth+1))
+                if not self.root.active:
+                    return
+        
+        else:
+            for branch in self.branches:
+                branch.gen_branches(target_depth)
+                if not self.root.active:
+                    return
+
+
+class Root:
+    def search(self, position, **kwargs):
+        self.active = True
+        self.root = Node(self, position, 0)
+
+        if "depth" in kwargs:
+            for depth in range(kwargs["depth"]):
+                self.root.gen_branches(depth)
+                if not self.active:
+                    break
 
 
 def main():

@@ -16,6 +16,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import threading
+import time
 import chess
 from copy import deepcopy
 
@@ -28,6 +29,7 @@ class Node:
         self.depth = depth
 
         self.branches = []
+        tree.nodes += 1
 
     def gen_branches(self, target_depth):
         if target_depth == self.depth + 1:
@@ -36,14 +38,46 @@ class Node:
                 new_board.push(move)
                 new_node = Node(new_board, self.tree, self, self.depth+1)
                 self.branches.append(new_node)
+                if not self.tree.active:
+                    return
 
         elif target_depth > self.depth + 1:
             for branch in self.branches:
                 branch.gen_branches(target_depth)
+                if not self.tree.active:
+                    return
+
+
+class Tree:
+    info_str = "info depth {depth} seldepth {depth} multipv 1 score {score} nodes {nodes} nps {nps} tbhits 0 time {time} pv {moves}"
+    def __init__(self):
+        self.init_vars()
+
+    def init_vars(self):
+        self.nodes = 0
+        self.depth = 0
+        self.score = 0
+        self.moves = []
+        self.active = True
+        self.time_start = time.time()
+
+    def search(self, **kwargs):
+        self.root = Node(kwargs["position"], self, None, 0)
+        for depth in range(5):
+            self.print_info()
+            self.depth = depth
+            self.root.gen_branches(depth)
+
+    def print_info(self):
+        time_elapse = time.time() - self.time_start
+        score = f"cp {self.score}"
+        info_str = self.info_str.format(depth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
+        print(info_str, flush=True)
 
 
 def main():
     position = chess.Board()
+    tree = Tree()
 
     while True:
         msg = input().strip()
@@ -74,7 +108,9 @@ def main():
                 position = chess.Board(fen)
 
         elif msg.startswith("go"):
-            print("going")
+            threading.Thread(target=tree.search, kwargs={"position": position}).start()
+        elif msg == "stop":
+            tree.active = False
 
 
 main()

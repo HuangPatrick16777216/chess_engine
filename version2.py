@@ -29,6 +29,8 @@ class Node:
         self.depth = depth
 
         self.branches = []
+        self.eval = None
+        self.best = None
         tree.nodes += 1
 
     def gen_branches(self, target_depth):
@@ -50,6 +52,31 @@ class Node:
                 branch.gen_branches(target_depth)
                 if self.depth == 0:
                     print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1}")
+
+    def minimax(self):
+        if len(self.branches) == 0:
+            prev_move = None if len(self.position.move_stack) == 0 else self.position.peek()
+            return (evaluate(), prev_move)
+
+        if self.position.turn:
+            max_eval = float("-inf")
+            best_move = None
+            for branch in self.branches:
+                evaluation = branch.evaluate()[0]
+                if evaluation >= max_eval:
+                    max_eval = evaluation
+                    best_move = branch.position.peek()
+            return (max_eval, best_move)
+
+        else:
+            min_eval = float("inf")
+            best_move = None
+            for branch in self.branches:
+                evaluation = branch.evaluate[0]
+                if evaluation < min_eval:
+                    min_eval = evaluation
+                    best_move = branch.position.peek()
+            return (min_eval, best_move)
 
 
 class Tree:
@@ -101,8 +128,8 @@ class Tree:
         print(info_str, flush=True)
 
 
-def evaluate(self):
-    pieces = self.position.fen().split(" ")[0]
+def evaluate(position):
+    pieces = position.fen().split(" ")[0]
     pieces_remaining = {
         "P": pieces.count("P"), "p": pieces.count("p"),
         "N": pieces.count("N"), "n": pieces.count("n"),

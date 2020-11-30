@@ -42,10 +42,14 @@ class Node:
                     return
 
         elif target_depth > self.depth + 1:
-            for branch in self.branches:
-                branch.gen_branches(target_depth)
+            for i, data in enumerate(zip(self.branches, self.position.generate_legal_moves())):
                 if not self.tree.active:
                     return
+
+                branch, move = data
+                branch.gen_branches(target_depth)
+                if self.depth == 0:
+                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1}")
 
 
 class Tree:
@@ -66,16 +70,18 @@ class Tree:
         self.root = Node(kwargs["position"], self, None, 0)
 
         threading.Thread(target=self.periodic_print).start()
-        for depth in range(5):
+        for depth in range(99):
             self.print_info()
             self.depth = depth
             self.root.gen_branches(depth)
             if not self.active:
                 break
 
+        self.print_info()
+
     def periodic_print(self):
-        base = 15000
-        inc = 100
+        base = 7500
+        inc = 200
         mult = 0
         while self.active:
             next_num = mult * base
@@ -93,6 +99,28 @@ class Tree:
         score = f"cp {self.score}"
         info_str = self.info_str.format(depth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
         print(info_str, flush=True)
+
+
+def evaluate(self):
+    pieces = self.position.fen().split(" ")[0]
+    pieces_remaining = {
+        "P": pieces.count("P"), "p": pieces.count("p"),
+        "N": pieces.count("N"), "n": pieces.count("n"),
+        "B": pieces.count("B"), "b": pieces.count("b"),
+        "R": pieces.count("R"), "r": pieces.count("r"),
+        "Q": pieces.count("Q"), "q": pieces.count("q")
+    }
+    #total_pieces = sum([pieces_remaining[key] for key in pieces_remaining])
+
+    material = 0
+    material += pieces_remaining["P"] - pieces_remaining["p"]
+    material += 3 * (pieces_remaining["N"] - pieces_remaining["n"])
+    material += 3 * (pieces_remaining["B"] - pieces_remaining["b"])
+    material += 5 * (pieces_remaining["R"] - pieces_remaining["r"])
+    material += 9 * (pieces_remaining["Q"] - pieces_remaining["q"])
+
+    score = 1 * material
+    return 100 * score
 
 
 def main():

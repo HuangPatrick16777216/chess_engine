@@ -15,7 +15,16 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import threading
 import chess
+
+
+class Node:
+    def __init__(self, position, tree, parent, depth):
+        self.position = position
+        self.tree = tree
+        self.parent = parent
+        self.depth = depth
 
 
 def main():

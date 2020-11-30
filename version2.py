@@ -17,6 +17,7 @@
 
 import threading
 import chess
+from copy import deepcopy
 
 
 class Node:
@@ -25,6 +26,20 @@ class Node:
         self.tree = tree
         self.parent = parent
         self.depth = depth
+
+        self.branches = []
+
+    def gen_branches(self, target_depth):
+        if target_depth == self.depth + 1:
+            for move in self.position.generate_legal_moves():
+                new_board = deepcopy(self.position)
+                new_board.push(move)
+                new_node = Node(new_board, self.tree, self, self.depth+1)
+                self.branches.append(new_node)
+
+        elif target_depth > self.depth + 1:
+            for branch in self.branches:
+                branch.gen_branches(target_depth)
 
 
 def main():

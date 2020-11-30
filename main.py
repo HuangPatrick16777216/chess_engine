@@ -97,7 +97,7 @@ class Node:
         center_weight = 0.2
 
         # General info
-        pieces = self.position.fen()
+        pieces = self.position.fen().split(" ")[0]
         pieces_remaining = {
             "P": pieces.count("P"), "p": pieces.count("p"),
             "N": pieces.count("N"), "n": pieces.count("n"),

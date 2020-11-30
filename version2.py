@@ -74,7 +74,7 @@ class Tree:
                 break
 
     def periodic_print(self):
-        base = 10000
+        base = 15000
         inc = 100
         mult = 0
         while self.active:
@@ -110,7 +110,7 @@ def main():
         elif msg == "uci":
             print("uciok", flush=True)
         elif msg == "d":
-            print(position)
+            print(position, flush=True)
 
         elif msg == "ucinewgame":
             position = chess.Board()

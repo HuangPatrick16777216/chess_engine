@@ -59,12 +59,10 @@ class Node:
                 best_move = None
                 for branch in self.branches:
                     curr_eval = branch.minimax()[0]
-                    if curr_eval > max_eval:
+                    if curr_eval >= max_eval:
                         max_eval = curr_eval
                         if self.depth == 0:
                             best_move = branch.position.peek()
-                    if not self.root.active:
-                        break
 
                 return (max_eval, best_move)
 
@@ -73,12 +71,10 @@ class Node:
                 best_move = None
                 for branch in self.branches:
                     curr_eval = branch.minimax()[0]
-                    if curr_eval < min_eval:
+                    if curr_eval <= min_eval:
                         min_eval = curr_eval
                         if self.depth == 0:
                             best_move = branch.position.peek()
-                    if not self.root.active:
-                        break
 
                 return (min_eval, best_move)
     
@@ -122,6 +118,7 @@ class Node:
         material += 9 * (pieces_remaining["Q"] - pieces_remaining["q"])
 
         # Center control
+        """
         inner_squares = ("D4", "D5", "E4", "E5")
         outer_squares = ("C3", "D3", "E3", "F3", "F4", "F5", "F6", "E6", "D6", "C6", "C5", "C4")
         inner_score = 0
@@ -137,8 +134,9 @@ class Node:
         inner_score /= total_pieces_remaining
         outer_score /= total_pieces_remaining
         center_score = inner_score + outer_score/4
+        """
 
-        score = material*mat_weight + center_score*center_weight
+        score = material*mat_weight# + center_score*center_weight
         score *= 100
         self.evaluation = score
         return score
@@ -185,7 +183,7 @@ class Tree:
 
     def calc_optimal_time(self, time_info):
         # todo calculate
-        return 10
+        return 5
 
     def timer_nodes(self, nodes):
         while self.nodes < nodes:

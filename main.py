@@ -59,10 +59,9 @@ class Node:
                 best_move = None
                 for branch in self.branches:
                     curr_eval = branch.minimax()[0]
-                    if curr_eval >= max_eval:
+                    if curr_eval > max_eval or best_move is None:
                         max_eval = curr_eval
-                        if self.depth == 0:
-                            best_move = branch.position.peek()
+                        best_move = branch.position.peek()
 
                 return (max_eval, best_move)
 
@@ -71,10 +70,9 @@ class Node:
                 best_move = None
                 for branch in self.branches:
                     curr_eval = branch.minimax()[0]
-                    if curr_eval <= min_eval:
+                    if curr_eval < min_eval or best_move is None:
                         min_eval = curr_eval
-                        if self.depth == 0:
-                            best_move = branch.position.peek()
+                        best_move = branch.position.peek()
 
                 return (min_eval, best_move)
     
@@ -229,7 +227,7 @@ class Tree:
             print(info_str, flush=True)
 
     def print_best_move(self):
-        print(f"bestmove {self.curr_move.uci()}", flush=True)
+        print(f"bestmove {self.root.minimax()[1].uci()}", flush=True)
 
 
 def main():

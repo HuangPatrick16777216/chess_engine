@@ -62,14 +62,34 @@ class Tree:
         self.time_start = time.time()
 
     def search(self, **kwargs):
+        self.init_vars()
         self.root = Node(kwargs["position"], self, None, 0)
+
+        threading.Thread(target=self.periodic_print).start()
         for depth in range(5):
             self.print_info()
             self.depth = depth
             self.root.gen_branches(depth)
+            if not self.active:
+                break
+
+    def periodic_print(self):
+        base = 10000
+        inc = 100
+        mult = 0
+        while self.active:
+            next_num = mult * base
+            while self.nodes < next_num:
+                time.sleep(0.01)
+                if not self.active:
+                    return
+            
+            self.print_info()
+            base += inc
+            mult += 1
 
     def print_info(self):
-        time_elapse = time.time() - self.time_start
+        time_elapse = time.time() - self.time_start + 0.01
         score = f"cp {self.score}"
         info_str = self.info_str.format(depth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
         print(info_str, flush=True)
@@ -83,6 +103,7 @@ def main():
         msg = input().strip()
         
         if msg == "quit":
+            tree.active = False
             return
         elif msg == "isready":
             print("readyok", flush=True)

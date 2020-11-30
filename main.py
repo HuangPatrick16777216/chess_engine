@@ -42,7 +42,10 @@ class Node:
                     return
         
         else:
-            for branch in self.branches:
+            for i, data in enumerate(zip(self.branches, self.position.generate_legal_moves())):
+                branch, move = data
+                if self.depth == 0:
+                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1}")
                 branch.gen_branches(target_depth)
                 if not self.root.active:
                     return
@@ -155,7 +158,7 @@ class Tree:
         self.init_vars()
         self.root = Node(self, kwargs["position"], 0)
         
-        threading.Thread(target=self.periodic_printer).start()
+        #threading.Thread(target=self.periodic_printer).start()
         total_depth = 99
         if "depth" in kwargs:
             total_depth = kwargs["depth"] + 1

@@ -31,9 +31,11 @@ class Node:
         self.branches = []
         self.eval = None
         self.best = None
+        self.best_definite = False
         tree.nodes += 1
 
     def gen_branches(self, target_depth):
+        self.best_definite = False
         if target_depth == self.depth + 1:
             for move in self.position.generate_legal_moves():
                 new_board = deepcopy(self.position)
@@ -50,33 +52,47 @@ class Node:
 
                 branch, move = data
                 branch.gen_branches(target_depth)
-                if self.depth == 0:
-                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1}")
+                #if self.depth == 0:
+                #    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1}")
 
     def minimax(self):
         if len(self.branches) == 0:
             prev_move = None if len(self.position.move_stack) == 0 else self.position.peek()
-            return (evaluate(), prev_move)
+            return (evaluate(self.position), prev_move)
 
         if self.position.turn:
             max_eval = float("-inf")
             best_move = None
             for branch in self.branches:
-                evaluation = branch.evaluate()[0]
+                evaluation = branch.minimax()[0]
                 if evaluation >= max_eval:
                     max_eval = evaluation
                     best_move = branch.position.peek()
+
+            self.eval = max_eval
+            self.best = best_move
+            self.best_definite = True
             return (max_eval, best_move)
 
         else:
             min_eval = float("inf")
             best_move = None
             for branch in self.branches:
-                evaluation = branch.evaluate[0]
+                evaluation = branch.minimax()[0]
                 if evaluation < min_eval:
                     min_eval = evaluation
                     best_move = branch.position.peek()
+
+            self.eval = min_eval
+            self.best = best_move
+            self.best_definite = True
             return (min_eval, best_move)
+
+    def get_best(self):
+        if self.best_definite:
+            return (self.eval, self.best)
+        else:
+            return self.minimax()
 
 
 class Tree:
@@ -105,9 +121,10 @@ class Tree:
                 break
 
         self.print_info()
+        print(self.root.get_best())
 
     def periodic_print(self):
-        base = 7500
+        base = 60000
         inc = 200
         mult = 0
         while self.active:

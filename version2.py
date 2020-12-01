@@ -129,7 +129,7 @@ class Tree:
                 break
 
         self.print_info()
-        print(self.root.get_best())
+        print("bestmove " + self.root.get_best()[1][0].uci())
 
     def periodic_print(self):
         base = 30000

@@ -120,8 +120,23 @@ class Tree:
         self.init_vars()
         self.root = Node(kwargs["position"], self, None, 0)
 
+        final_depth = 99
+        if "depth" in kwargs:
+            final_depth = kwargs["depth"]
+        elif "nodes" in kwargs:
+            threading.Thread(target=self.timer_nodes, args=(kwargs["nodes"],)).start()
+            final_depth = 99
+        elif "wtime" in kwargs or "btime" in kwargs:
+            time = self.calc_move_time(kwargs)
+            threading.Thread(target=self.timer_time, args=(time,)).start()
+            final_depth = 99
+        elif "movetime" in kwargs:
+            time = kwargs["movetime"] / 1000
+            threading.Thread(target=self.timer_time, args=(time,)).start()
+            final_depth = 99
+
         #threading.Thread(target=self.periodic_print).start()
-        for depth in range(99):
+        for depth in range(final_depth+1):
             self.print_info()
             self.depth = depth
             self.root.gen_branches(depth)
@@ -130,6 +145,11 @@ class Tree:
 
         self.print_info()
         print("bestmove " + self.root.get_best()[1][0].uci())
+
+    def timer_nodes(self, nodes):
+        while self.nodes < nodes:
+            time.sleep(0.01)
+        self.active = False
 
     def periodic_print(self):
         base = 30000
@@ -214,7 +234,21 @@ def main():
                 position = chess.Board(fen)
 
         elif msg.startswith("go"):
-            threading.Thread(target=tree.search, kwargs={"position": position}).start()
+            msg = msg.replace("go", "").strip()
+            kwargs = {"position": position}
+
+            if msg.startswith("nodes"):
+                kwargs["nodes"] = int(msg.replace("nodes", "").strip())
+            elif msg.startswith("depth"):
+                kwargs["depth"] = int(msg.replace("depth", "").strip())
+            elif msg.startswith("movetime"):
+                kwargs["movetime"] = int(msg.replace("movetime", "").strip())
+            elif "wtime" in kwargs or "btime" in kwargs:
+                parts = msg.split(" ")
+                for i in range(0, len(parts)//2):
+                    kwargs[parts[i*2]] = int(parts[i*2+1]) / 1000
+
+            threading.Thread(target=tree.search, kwargs=kwargs).start()
         elif msg == "stop":
             tree.active = False
 

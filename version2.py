@@ -58,33 +58,39 @@ class Node:
     def minimax(self):
         if len(self.branches) == 0:
             prev_move = None if len(self.position.move_stack) == 0 else self.position.peek()
-            return (evaluate(self.position), prev_move)
+            self.eval = evaluate(self.position)
+            self.best = [prev_move]
+            return (self.eval, self.best)
 
         if self.position.turn:
             max_eval = float("-inf")
             best_move = None
-            for branch in self.branches:
+            best_ind = 0
+            for i, branch in enumerate(self.branches):
                 evaluation = branch.minimax()[0]
                 if evaluation >= max_eval:
                     max_eval = evaluation
                     best_move = branch.position.peek()
+                    best_ind = i
 
             self.eval = max_eval
-            self.best = best_move
+            self.best = [best_move] + self.branches[best_ind].best
             self.best_definite = True
             return (max_eval, best_move)
 
         else:
             min_eval = float("inf")
             best_move = None
-            for branch in self.branches:
+            best_ind = 0
+            for i, branch in enumerate(self.branches):
                 evaluation = branch.minimax()[0]
                 if evaluation < min_eval:
                     min_eval = evaluation
                     best_move = branch.position.peek()
+                    best_ind = i
 
             self.eval = min_eval
-            self.best = best_move
+            self.best = [best_move] + self.branches[best_ind].best
             self.best_definite = True
             return (min_eval, best_move)
 
@@ -92,7 +98,8 @@ class Node:
         if self.best_definite:
             return (self.eval, self.best)
         else:
-            return self.minimax()
+            self.minimax()
+            return (self.eval, self.best)
 
 
 class Tree:
@@ -124,7 +131,7 @@ class Tree:
         print(self.root.get_best())
 
     def periodic_print(self):
-        base = 60000
+        base = 30000
         inc = 200
         mult = 0
         while self.active:
@@ -134,13 +141,17 @@ class Tree:
                 if not self.active:
                     return
             
-            self.print_info()
+            threading.Thread(target=self.print_info).start()
             base += inc
             mult += 1
 
     def print_info(self):
-        time_elapse = time.time() - self.time_start + 0.01
+        info = self.root.get_best()
+        self.score = info[0]
+        self.moves = info[1]
         score = f"cp {self.score}"
+
+        time_elapse = time.time() - self.time_start + 0.01
         info_str = self.info_str.format(depth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
         print(info_str, flush=True)
 

@@ -52,14 +52,15 @@ class Node:
 
                 branch, move = data
                 branch.gen_branches(target_depth)
-                #if self.depth == 0:
-                #    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1}")
+                if self.depth == 0:
+                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1}")
 
     def minimax(self):
         if len(self.branches) == 0:
             prev_move = None if len(self.position.move_stack) == 0 else self.position.peek()
             self.eval = evaluate(self.position)
             self.best = [prev_move]
+            self.best_definite = True
             return (self.eval, self.best)
 
         if self.position.turn:
@@ -119,7 +120,7 @@ class Tree:
         self.init_vars()
         self.root = Node(kwargs["position"], self, None, 0)
 
-        threading.Thread(target=self.periodic_print).start()
+        #threading.Thread(target=self.periodic_print).start()
         for depth in range(99):
             self.print_info()
             self.depth = depth
@@ -148,12 +149,13 @@ class Tree:
     def print_info(self):
         info = self.root.get_best()
         self.score = info[0]
-        self.moves = info[1]
+        self.moves = " ".join([move.uci() for move in info[1][:-1] if move is not None])
         score = f"cp {self.score}"
 
         time_elapse = time.time() - self.time_start + 0.01
         info_str = self.info_str.format(depth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
-        print(info_str, flush=True)
+        if self.active:
+            print(info_str, flush=True)
 
 
 def evaluate(position):

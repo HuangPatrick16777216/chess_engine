@@ -53,7 +53,7 @@ class Node:
                 branch, move = data
                 branch.gen_branches(target_depth)
                 if self.depth == 0:
-                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1}")
+                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1}", flush=True)
 
     def minimax(self):
         if len(self.branches) == 0:
@@ -143,8 +143,8 @@ class Tree:
             if not self.active:
                 break
 
-        self.print_info()
-        print("bestmove " + self.root.get_best()[1][0].uci())
+        self.print_info(force=True)
+        print("bestmove " + self.root.get_best()[1][0].uci(), flush=True)
 
     def timer_nodes(self, nodes):
         while self.nodes < nodes:
@@ -175,7 +175,7 @@ class Tree:
             base += inc
             mult += 1
 
-    def print_info(self):
+    def print_info(self, force=False):
         info = self.root.get_best()
         self.score = info[0]
         self.moves = " ".join([move.uci() for move in info[1][:-1] if move is not None])
@@ -183,7 +183,7 @@ class Tree:
 
         time_elapse = time.time() - self.time_start + 0.01
         info_str = self.info_str.format(depth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
-        if self.active:
+        if self.active or force:
             print(info_str, flush=True)
 
 

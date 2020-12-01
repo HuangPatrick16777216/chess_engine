@@ -151,6 +151,15 @@ class Tree:
             time.sleep(0.01)
         self.active = False
 
+    def timer_time(self, total_time):
+        time_end = time.time() + total_time
+        while time.time() < time_end:
+            time.sleep(0.01)
+        self.active = False
+
+    def calc_move_time(self):
+        return 5
+
     def periodic_print(self):
         base = 30000
         inc = 200

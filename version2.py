@@ -127,12 +127,12 @@ class Tree:
             threading.Thread(target=self.timer_nodes, args=(kwargs["nodes"],)).start()
             final_depth = 99
         elif "wtime" in kwargs or "btime" in kwargs:
-            time = self.calc_move_time(kwargs)
-            threading.Thread(target=self.timer_time, args=(time,)).start()
+            move_time = self.calc_move_time(kwargs)
+            threading.Thread(target=self.timer_time, args=(move_time,)).start()
             final_depth = 99
         elif "movetime" in kwargs:
-            time = kwargs["movetime"] / 1000
-            threading.Thread(target=self.timer_time, args=(time,)).start()
+            move_time = kwargs["movetime"] / 1000
+            threading.Thread(target=self.timer_time, args=(move_time,)).start()
             final_depth = 99
 
         #threading.Thread(target=self.periodic_print).start()
@@ -157,7 +157,7 @@ class Tree:
             time.sleep(0.01)
         self.active = False
 
-    def calc_move_time(self):
+    def calc_move_time(self, kwargs):
         return 5
 
     def periodic_print(self):
@@ -252,7 +252,7 @@ def main():
                 kwargs["depth"] = int(msg.replace("depth", "").strip())
             elif msg.startswith("movetime"):
                 kwargs["movetime"] = int(msg.replace("movetime", "").strip())
-            elif "wtime" in kwargs or "btime" in kwargs:
+            elif "wtime" in msg or "btime" in msg:
                 parts = msg.split(" ")
                 for i in range(0, len(parts)//2):
                     kwargs[parts[i*2]] = int(parts[i*2+1]) / 1000

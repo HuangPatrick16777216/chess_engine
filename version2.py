@@ -34,7 +34,7 @@ class Node:
         self.best_definite = False
         tree.nodes += 1
 
-    def gen_branches(self, target_depth):
+    def gen_branches(self, target_depth, time_start=None):
         self.best_definite = False
         if target_depth == self.depth + 1:
             for move in self.position.generate_legal_moves():
@@ -44,13 +44,16 @@ class Node:
                 self.branches.append(new_node)
                 if not self.tree.active:
                     return
+
             self.minimax()
+            self.set_indefinite()
 
         elif target_depth > self.depth + 1:
             for i, data in enumerate(zip(self.branches, self.position.generate_legal_moves())):
                 branch, move = data
                 if self.depth == 0:
-                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1}", flush=True)
+                    time_elapse = time.time() - time_start
+                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1} nodes {self.tree.nodes} nps {int(self.tree.nodes/time_elapse)} time {int(time_elapse*1000)}", flush=True)
                 branch.gen_branches(target_depth)
 
                 if not self.tree.active:
@@ -108,6 +111,11 @@ class Node:
             self.minimax()
             return (self.eval, self.best)
 
+    def set_indefinite(self):
+        self.best_definite = False
+        if self.parent is not None:
+            self.parent.set_indefinite()
+
 
 class Tree:
     info_str = "info depth {depth} seldepth {depth} multipv 1 score {score} nodes {nodes} nps {nps} tbhits 0 time {time} pv {moves}"
@@ -146,7 +154,7 @@ class Tree:
         for depth in range(final_depth+1):
             self.print_info()
             self.depth = depth
-            self.root.gen_branches(depth)
+            self.root.gen_branches(depth, self.time_start)
             if not self.active:
                 break
 

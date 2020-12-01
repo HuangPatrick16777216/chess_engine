@@ -59,6 +59,11 @@ class Node:
         if len(self.branches) == 0:
             prev_move = None if len(self.position.move_stack) == 0 else self.position.peek()
             self.eval = evaluate(self.position)
+            if self.eval == float("inf"):
+                self.eval = 16777216 - self.depth
+            elif self.eval == float("-inf"):
+                self.eval = -16777216 + self.depth
+
             self.best = [prev_move]
             self.best_definite = True
             return (self.eval, self.best)
@@ -85,7 +90,7 @@ class Node:
             best_ind = 0
             for i, branch in enumerate(self.branches):
                 evaluation = branch.minimax()[0]
-                if evaluation < min_eval:
+                if evaluation <= min_eval:
                     min_eval = evaluation
                     best_move = branch.position.peek()
                     best_ind = i
@@ -118,6 +123,7 @@ class Tree:
 
     def search(self, **kwargs):
         self.init_vars()
+        self.position = kwargs["position"]
         self.root = Node(kwargs["position"], self, None, 0)
 
         final_depth = 99
@@ -179,7 +185,14 @@ class Tree:
         info = self.root.get_best()
         self.score = info[0]
         self.moves = " ".join([move.uci() for move in info[1][:-1] if move is not None])
-        score = f"cp {self.score}"
+        if self.score > 1000000:
+            mate_in = (abs(16777216 - self.score) + 1) // 2
+            score = f"mate +{mate_in}"
+        elif self.score < -1000000:
+            mate_in = (abs(16777216 + self.score) + 1) // 2
+            score = f"mate -{mate_in}"
+        else:
+            score = f"cp {self.score}" if self.position.turn else f"cp {-1 * self.score}"
 
         time_elapse = time.time() - self.time_start + 0.01
         info_str = self.info_str.format(depth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
@@ -187,7 +200,16 @@ class Tree:
             print(info_str, flush=True)
 
 
-def evaluate(position):
+def evaluate(position: chess.Board):
+    if position.is_game_over():
+        result = position.result()
+        if result == "1-0":
+            return float("inf")
+        elif result == "0-1":
+            return float("-inf")
+        elif result == "1/2-1/2":
+            return 0
+
     pieces = position.fen().split(" ")[0]
     pieces_remaining = {
         "P": pieces.count("P"), "p": pieces.count("p"),

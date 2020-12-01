@@ -44,16 +44,17 @@ class Node:
                 self.branches.append(new_node)
                 if not self.tree.active:
                     return
+            self.minimax()
 
         elif target_depth > self.depth + 1:
             for i, data in enumerate(zip(self.branches, self.position.generate_legal_moves())):
-                if not self.tree.active:
-                    return
-
                 branch, move = data
-                branch.gen_branches(target_depth)
                 if self.depth == 0:
                     print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1}", flush=True)
+                branch.gen_branches(target_depth)
+
+                if not self.tree.active:
+                    return
 
     def minimax(self):
         if len(self.branches) == 0:
@@ -73,7 +74,7 @@ class Node:
             best_move = None
             best_ind = 0
             for i, branch in enumerate(self.branches):
-                evaluation = branch.minimax()[0]
+                evaluation = branch.get_best()[0]
                 if evaluation >= max_eval:
                     max_eval = evaluation
                     best_move = branch.position.peek()
@@ -89,7 +90,7 @@ class Node:
             best_move = None
             best_ind = 0
             for i, branch in enumerate(self.branches):
-                evaluation = branch.minimax()[0]
+                evaluation = branch.get_best()[0]
                 if evaluation <= min_eval:
                     min_eval = evaluation
                     best_move = branch.position.peek()

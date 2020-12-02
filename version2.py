@@ -220,7 +220,7 @@ class Tree:
             mate_in = (abs(16777216 + self.score) + 1) // 2
             score = f"mate -{mate_in}"
         else:
-            score = f"cp {self.score}" if self.position.turn else f"cp {-1 * self.score}"
+            score = f"cp {int(self.score)}" if self.position.turn else f"cp {-1 * int(self.score)}"
 
         time_elapse = time.time() - self.time_start + 0.01
         info_str = self.info_str.format(depth=max(int(self.depth/1.5), 1), seldepth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
@@ -238,6 +238,7 @@ def evaluate(position: chess.Board):
         elif result == "1/2-1/2":
             return 0
 
+    
     # General
     pieces = position.fen().split(" ")[0]
     pieces_remaining = {
@@ -248,6 +249,7 @@ def evaluate(position: chess.Board):
         "Q": pieces.count("Q"), "q": pieces.count("q")
     }
 
+
     # Material
     material = 0
     material += pieces_remaining["P"] - pieces_remaining["p"]
@@ -255,6 +257,7 @@ def evaluate(position: chess.Board):
     material += 3 * (pieces_remaining["B"] - pieces_remaining["b"])
     material += 5 * (pieces_remaining["R"] - pieces_remaining["r"])
     material += 9 * (pieces_remaining["Q"] - pieces_remaining["q"])
+
 
     # Center
     inner_center = ("D4", "D5", "E4", "E5")
@@ -274,9 +277,33 @@ def evaluate(position: chess.Board):
     center = 0
     center += (white_inner + white_outer/4) / sum([pieces_remaining[x] for x in pieces_remaining if x.isupper()])
     center -= (black_inner + black_outer/4) / sum([pieces_remaining[x] for x in pieces_remaining if x.islower()])
-    center /= 2
+    center /= 3
+
+
+    # Pawns
+    white_ranks = 0
+    white_total_pawns = 0
+    for i in range(64):
+        piece = position.piece_at(i)
+        if piece is not None and piece.symbol() == "P":
+            white_ranks += i // 8
+            white_total_pawns += 1
+    white_ranks /= white_total_pawns
+
+    black_ranks = 0
+    black_total_pawns = 0
+    for i in range(64):
+        piece = position.piece_at(i)
+        if piece is not None and piece.symbol() == "p":
+            black_ranks += 7 - (i // 8)
+            black_total_pawns += 1
+    black_ranks /= black_total_pawns
+
+    pawns = white_ranks - black_ranks
+    pawns /= 12
     
-    score = material + center
+
+    score = material + center + pawns
     return 100 * score
 
 

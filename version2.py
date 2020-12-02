@@ -214,7 +214,7 @@ class Tree:
         self.active = False
 
     def calc_move_time(self, kwargs):
-        return 5
+        return 20
 
     def periodic_print(self):
         base = 30000

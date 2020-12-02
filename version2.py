@@ -56,15 +56,20 @@ class Node:
                     return
 
             if len(evals) > 15:
-                evals = sorted(evals, key=lambda x: x[0])
+                evals = list(reversed(sorted(evals, key=lambda x: x[0])))
                 num_first = max(len(evals)//5, 4)
                 num_second = min(len(evals)//2, 11)
-                for branch in self.branches[:num_first]:
-                    branch.priority = 0
-                for branch in self.branches[num_first:num_second]:
-                    branch.priority = 1
-                for branch in self.branches[num_second:]:
-                    branch.priority = 2
+                first_indexes = [x[1] for x in evals[:num_first]]
+                second_indexes = [x[1] for x in evals[num_first:num_second]]
+                third_indexes = [x[1] for x in evals[num_second:]]
+                
+                for i, branch in enumerate(self.branches):
+                    if i in first_indexes:
+                        branch.priority = 0
+                    elif i in second_indexes:
+                        branch.priority = 1
+                    elif i in third_indexes:
+                        branch.priority = 2
 
             self.minimax()
             self.set_indefinite()

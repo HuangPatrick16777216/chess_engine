@@ -60,6 +60,7 @@ class Node:
                     return
 
     def minimax(self):
+        self.best_definite = True
         if len(self.branches) == 0:
             prev_move = None if len(self.position.move_stack) == 0 else self.position.peek()
             self.eval = evaluate(self.position)
@@ -69,7 +70,6 @@ class Node:
                 self.eval = -16777216 + self.depth
 
             self.best = [prev_move]
-            self.best_definite = True
             return (self.eval, self.best)
 
         if self.position.turn:
@@ -85,7 +85,6 @@ class Node:
 
             self.eval = max_eval
             self.best = [best_move] + self.branches[best_ind].best
-            self.best_definite = True
             return (max_eval, best_move)
 
         else:
@@ -101,7 +100,6 @@ class Node:
 
             self.eval = min_eval
             self.best = [best_move] + self.branches[best_ind].best
-            self.best_definite = True
             return (min_eval, best_move)
 
     def get_best(self):

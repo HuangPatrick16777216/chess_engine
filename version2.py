@@ -197,10 +197,11 @@ class Tree:
         moves_passed = len(position.move_stack)
         moves_left = 25 if moves_passed < 25 else moves_passed / 2
         time_left = kwargs[f"{turn}time"]
+        real_time_left = time_left
         if f"{turn}inc" in kwargs:
             time_left += kwargs[f"{turn}inc"] * moves_left
 
-        return min(time_left / moves_left, 15)
+        return min(time_left / moves_left, 15, real_time_left / 2)
 
     def periodic_print(self):
         base = 30000

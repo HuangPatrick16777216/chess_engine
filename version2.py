@@ -38,6 +38,11 @@ class Node:
 
     def gen_branches(self, target_depth, time_start=None):
         self.best_definite = False
+        if self.priority == 1:
+            target_depth -= 2
+        elif self.priority == 2:
+            target_depth -= 5
+
         if target_depth == self.depth + 1:
             evals = []
             for i, move in enumerate(self.legal_moves):
@@ -131,7 +136,7 @@ class Node:
 
 
 class Tree:
-    info_str = "info depth {depth} seldepth {depth} multipv 1 score {score} nodes {nodes} nps {nps} tbhits 0 time {time} pv {moves}"
+    info_str = "info depth {depth} seldepth {seldepth} multipv 1 score {score} nodes {nodes} nps {nps} tbhits 0 time {time} pv {moves}"
     def __init__(self):
         self.init_vars()
 
@@ -217,7 +222,7 @@ class Tree:
             score = f"cp {self.score}" if self.position.turn else f"cp {-1 * self.score}"
 
         time_elapse = time.time() - self.time_start + 0.01
-        info_str = self.info_str.format(depth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
+        info_str = self.info_str.format(depth=max(self.depth-5, 1), seldepth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
         if self.active or force:
             print(info_str, flush=True)
 

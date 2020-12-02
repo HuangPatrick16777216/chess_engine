@@ -78,7 +78,7 @@ class Node:
             best_ind = 0
             for i, branch in enumerate(self.branches):
                 evaluation = branch.get_best()[0]
-                if evaluation >= max_eval:
+                if evaluation > max_eval:
                     max_eval = evaluation
                     best_move = branch.position.peek()
                     best_ind = i
@@ -94,7 +94,7 @@ class Node:
             best_ind = 0
             for i, branch in enumerate(self.branches):
                 evaluation = branch.get_best()[0]
-                if evaluation <= min_eval:
+                if evaluation < min_eval:
                     min_eval = evaluation
                     best_move = branch.position.peek()
                     best_ind = i

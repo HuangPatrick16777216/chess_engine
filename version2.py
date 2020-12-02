@@ -224,10 +224,10 @@ class Tree:
         self.moves = " ".join([move.uci() for move in info[1][:-1] if move is not None])
         if self.score > 1000000:
             mate_in = (abs(16777216 - self.score) + 1) // 2
-            score = f"mate +{mate_in}"
+            score = f"mate +{mate_in}" if self.position.turn else f"mate -{mate_in}"
         elif self.score < -1000000:
             mate_in = (abs(16777216 + self.score) + 1) // 2
-            score = f"mate -{mate_in}"
+            score = f"mate -{mate_in}" if self.position.turn else f"mate +{mate_in}"
         else:
             score = f"cp {int(self.score)}" if self.position.turn else f"cp {-1 * int(self.score)}"
 

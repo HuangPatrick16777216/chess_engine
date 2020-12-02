@@ -40,9 +40,9 @@ class Node:
     def gen_branches(self, target_depth, time_start=None):
         self.best_definite = False
         if self.priority == 1:
-            target_depth = int(target_depth / 1.3)
+            target_depth = int(target_depth / 1.2)
         elif self.priority == 2:
-            target_depth = int(target_depth / 1.7)
+            target_depth = int(target_depth / 1.5)
 
         if target_depth == self.depth + 1:
             evals = []
@@ -286,7 +286,7 @@ def evaluate(position: chess.Board):
     center = 0
     center += (white_inner + white_outer/4) / sum([pieces_remaining[x] for x in pieces_remaining if x.isupper()])
     center -= (black_inner + black_outer/4) / sum([pieces_remaining[x] for x in pieces_remaining if x.islower()])
-    center /= 3
+    center /= 4
 
 
     # Pawns
@@ -309,7 +309,7 @@ def evaluate(position: chess.Board):
     black_ranks /= black_total_pawns
 
     pawns = white_ranks - black_ranks
-    pawns /= 12
+    pawns /= 8
     
 
     score = material + center + pawns
@@ -332,6 +332,8 @@ def main():
             print("uciok", flush=True)
         elif msg == "d":
             print(position, flush=True)
+        elif msg == "eval":
+            print(evaluate(position))
 
         elif msg == "ucinewgame":
             position = chess.Board()

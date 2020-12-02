@@ -33,23 +33,38 @@ class Node:
         self.best = None
         self.best_definite = False
         tree.nodes += 1
+        self.legal_moves = list(position.generate_legal_moves())
+        self.priority = 0
 
     def gen_branches(self, target_depth, time_start=None):
         self.best_definite = False
         if target_depth == self.depth + 1:
-            for move in self.position.generate_legal_moves():
+            evals = []
+            for i, move in enumerate(self.legal_moves):
                 new_board = deepcopy(self.position)
                 new_board.push(move)
                 new_node = Node(new_board, self.tree, self, self.depth+1)
                 self.branches.append(new_node)
+                evals.append((evaluate(new_board), i))
                 if not self.tree.active:
                     return
+
+            if len(evals) > 15:
+                evals = sorted(evals, key=lambda x: x[0])
+                num_first = max(len(evals)//5, 4)
+                num_second = min(len(evals)//2, 11)
+                for branch in self.branches[:num_first]:
+                    branch.priority = 0
+                for branch in self.branches[num_first:num_second]:
+                    branch.priority = 1
+                for branch in self.branches[num_second:]:
+                    branch.priority = 2
 
             self.minimax()
             self.set_indefinite()
 
         elif target_depth > self.depth + 1:
-            for i, data in enumerate(zip(self.branches, self.position.generate_legal_moves())):
+            for i, data in enumerate(zip(self.branches, self.legal_moves)):
                 branch, move = data
                 if self.depth == 0:
                     time_elapse = time.time() - time_start

@@ -15,6 +15,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from os import getloadavg
 import threading
 import time
 import chess
@@ -237,6 +238,7 @@ def evaluate(position: chess.Board):
         elif result == "1/2-1/2":
             return 0
 
+    # General
     pieces = position.fen().split(" ")[0]
     pieces_remaining = {
         "P": pieces.count("P"), "p": pieces.count("p"),
@@ -245,8 +247,8 @@ def evaluate(position: chess.Board):
         "R": pieces.count("R"), "r": pieces.count("r"),
         "Q": pieces.count("Q"), "q": pieces.count("q")
     }
-    #total_pieces = sum([pieces_remaining[key] for key in pieces_remaining])
 
+    # Material
     material = 0
     material += pieces_remaining["P"] - pieces_remaining["p"]
     material += 3 * (pieces_remaining["N"] - pieces_remaining["n"])
@@ -254,7 +256,27 @@ def evaluate(position: chess.Board):
     material += 5 * (pieces_remaining["R"] - pieces_remaining["r"])
     material += 9 * (pieces_remaining["Q"] - pieces_remaining["q"])
 
-    score = 1 * material
+    # Center
+    inner_center = ("D4", "D5", "E4", "E5")
+    outer_center = ("C3", "C4", "C5", "C6", "D6", "E6", "F6", "F5", "F4", "F3", "E3", "D3")
+
+    white_inner = 0
+    black_inner = 0
+    white_outer = 0
+    black_outer = 0
+
+    for square in inner_center:
+        white_inner += len(position.attackers(chess.WHITE, getattr(chess, square)))
+        black_inner += len(position.attackers(chess.BLACK, getattr(chess, square)))
+    for square in outer_center:
+        white_outer += len(position.attackers(chess.WHITE, getattr(chess, square)))
+        black_outer += len(position.attackers(chess.BLACK, getattr(chess, square)))
+    center = 0
+    center += (white_inner + white_outer/4) / sum([pieces_remaining[x] for x in pieces_remaining if x.isupper()])
+    center -= (black_inner + black_outer/4) / sum([pieces_remaining[x] for x in pieces_remaining if x.islower()])
+    center /= 2
+    
+    score = material + center
     return 100 * score
 
 

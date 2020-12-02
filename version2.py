@@ -21,29 +21,6 @@ import chess
 from copy import deepcopy
 
 
-class IntProp:
-    def __init__(self, name, default, min, max):
-        self.name = name
-        self.default = default
-        self.value = default
-        self.min = min
-        self.max = max
-
-    def __repr__(self):
-        return f"option name {self.name} type spin default {self.default} min {self.min} max {self.max}"
-
-
-class Options:
-    props = {}
-    def __init__(self):
-        self.props["low"] = (IntProp("LowOffset", 2, 0, 10))
-        self.props["med"] = (IntProp("MedOffset", 1, 0, 10))
-
-    def print(self):
-        for key in self.props:
-            print(self.props[key], flush=True)
-
-
 class Node:
     def __init__(self, position, tree, parent, depth):
         self.position = position
@@ -62,9 +39,9 @@ class Node:
     def gen_branches(self, target_depth, time_start=None):
         self.best_definite = False
         if self.priority == 1:
-            target_depth -= options.props["med"].value
+            target_depth = int(target_depth / 1.3)
         elif self.priority == 2:
-            target_depth -= options.props["low"].value
+            target_depth = int(target_depth / 1.7)
 
         if target_depth == self.depth + 1:
             evals = []
@@ -245,7 +222,7 @@ class Tree:
             score = f"cp {self.score}" if self.position.turn else f"cp {-1 * self.score}"
 
         time_elapse = time.time() - self.time_start + 0.01
-        info_str = self.info_str.format(depth=max(self.depth-options.props["low"].value, 1), seldepth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
+        info_str = self.info_str.format(depth=max(int(self.depth/1.5), 1), seldepth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
         if self.active or force:
             print(info_str, flush=True)
 
@@ -282,8 +259,6 @@ def evaluate(position: chess.Board):
 
 
 def main():
-    global options
-    options = Options()
     position = chess.Board()
     tree = Tree()
 
@@ -296,18 +271,9 @@ def main():
         elif msg == "isready":
             print("readyok", flush=True)
         elif msg == "uci":
-            options.print()
             print("uciok", flush=True)
         elif msg == "d":
             print(position, flush=True)
-        elif msg.startswith("setoption"):
-            msg = msg.replace("setoption", "").strip()
-            name = msg.replace("name", "").strip().split(" ")[0]
-            value = msg.split("value")[1].strip()
-
-            for key in options.props:
-                if options.props[key].name == name:
-                    options.props[key].value = int(value)
 
         elif msg == "ucinewgame":
             position = chess.Board()
@@ -345,5 +311,4 @@ def main():
             tree.active = False
 
 
-options = None
 main()

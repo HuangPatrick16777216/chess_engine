@@ -192,7 +192,15 @@ class Tree:
         self.active = False
 
     def calc_move_time(self, kwargs):
-        return 20
+        position = kwargs["position"]
+        turn = "w" if position.turn else "b"
+        moves_passed = len(position.move_stack)
+        moves_left = 25 if moves_passed < 25 else moves_passed / 2
+        time_left = kwargs[f"{turn}time"]
+        if f"{turn}inc" in kwargs:
+            time_left += kwargs[f"{turn}inc"] * moves_left
+
+        return min(time_left / moves_left, 15)
 
     def periodic_print(self):
         base = 30000

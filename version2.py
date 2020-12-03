@@ -240,7 +240,7 @@ class Tree:
             score = f"cp {int(self.score)}" if self.position.turn else f"cp {-1 * int(self.score)}"
 
         time_elapse = time.time() - self.time_start + 0.01
-        info_str = self.info_str.format(depth=max(int(self.depth/priority_low_fac), 1), seldepth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
+        info_str = self.info_str.format(depth=max(int(self.depth*priority_low_fac), 1), seldepth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
         if self.active or force:
             print(info_str, flush=True)
 
@@ -380,5 +380,5 @@ def main():
 
 
 priority_med_fac = 0.8
-priority_low_fac = 0.6
+priority_low_fac = 0.5
 main()

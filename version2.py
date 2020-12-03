@@ -40,9 +40,9 @@ class Node:
     def gen_branches(self, target_depth, time_start=None):
         self.best_definite = False
         if self.priority == 1:
-            target_depth = int(target_depth / 1.3)
+            target_depth = int(target_depth * priority_med_fac)
         elif self.priority == 2:
-            target_depth = int(target_depth / 1.6)
+            target_depth = int(target_depth * priority_low_fac)
 
         if target_depth == self.depth + 1:
             evals = []
@@ -240,7 +240,7 @@ class Tree:
             score = f"cp {int(self.score)}" if self.position.turn else f"cp {-1 * int(self.score)}"
 
         time_elapse = time.time() - self.time_start + 0.01
-        info_str = self.info_str.format(depth=max(int(self.depth/1.5), 1), seldepth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
+        info_str = self.info_str.format(depth=max(int(self.depth/priority_low_fac), 1), seldepth=self.depth, score=score, nodes=self.nodes, nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=self.moves)
         if self.active or force:
             print(info_str, flush=True)
 
@@ -294,7 +294,7 @@ def evaluate(position: chess.Board):
     center = 0
     center += (white_inner + white_outer/4) / sum([pieces_remaining[x] for x in pieces_remaining if x.isupper()])
     center -= (black_inner + black_outer/4) / sum([pieces_remaining[x] for x in pieces_remaining if x.islower()])
-    center /= 4
+    center /= 3
 
 
     # Pawns
@@ -317,7 +317,7 @@ def evaluate(position: chess.Board):
     black_ranks /= black_total_pawns
 
     pawns = white_ranks - black_ranks
-    pawns /= 8
+    pawns /= 9
     
 
     score = material + center + pawns
@@ -379,4 +379,6 @@ def main():
             tree.active = False
 
 
+priority_med_fac = 0.8
+priority_low_fac = 0.6
 main()

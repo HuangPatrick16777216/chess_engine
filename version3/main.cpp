@@ -19,6 +19,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "funcs.hpp"
 using namespace std;
 
 
@@ -27,6 +28,7 @@ int main() {
 
     while (true) {
         getline(cin, msg);
+        msg = strip(msg);
 
         if (msg == "quit") return 0;
         else if (msg == "isready") cout << "readyok" << endl;

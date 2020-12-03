@@ -29,5 +29,5 @@ for f in files:
     cmd += " "
 
 cmd += "-o "
-cmd += os.path.join(PARENT, "patrick.exe")
+cmd += os.path.join(PARENT, "apatrick.exe")
 os.system(cmd)

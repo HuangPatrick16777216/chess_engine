@@ -20,11 +20,13 @@
 #include <vector>
 #include <string>
 #include "funcs.hpp"
+#include "position.hpp"
 using namespace std;
 
 
 int main() {
     string msg;
+    Position position;
 
     while (true) {
         getline(cin, msg);
@@ -33,5 +35,6 @@ int main() {
         if (msg == "quit") return 0;
         else if (msg == "isready") cout << "readyok" << endl;
         else if (msg == "uci") cout << "uciok" << endl;
+        else if (msg == "d") cout << position.print() << endl;
     }
 }

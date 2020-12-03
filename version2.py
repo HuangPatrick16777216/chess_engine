@@ -40,9 +40,9 @@ class Node:
     def gen_branches(self, target_depth, time_start=None):
         self.best_definite = False
         if self.priority == 1:
-            target_depth = int(target_depth / 1.2)
+            target_depth = int(target_depth / 1.3)
         elif self.priority == 2:
-            target_depth = int(target_depth / 1.5)
+            target_depth = int(target_depth / 1.6)
 
         if target_depth == self.depth + 1:
             evals = []
@@ -56,13 +56,16 @@ class Node:
                     return
 
             if len(evals) > 15:
-                evals = list(reversed(sorted(evals, key=lambda x: x[0])))
+                evals = sorted(evals, key=lambda x: x[0])
+                if self.position.turn:
+                    evals = list(reversed(evals))
+
                 num_first = max(len(evals)//5, 4)
                 num_second = min(len(evals)//2, 11)
                 first_indexes = [x[1] for x in evals[:num_first]]
                 second_indexes = [x[1] for x in evals[num_first:num_second]]
                 third_indexes = [x[1] for x in evals[num_second:]]
-                
+
                 for i, branch in enumerate(self.branches):
                     if i in first_indexes:
                         branch.priority = 0

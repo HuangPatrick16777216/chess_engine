@@ -81,8 +81,9 @@ class Node:
             for i, data in enumerate(zip(self.branches, self.legal_moves)):
                 branch, move = data
                 if self.depth == 0:
-                    time_elapse = time.time() - time_start
-                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1} nodes {self.tree.nodes} nps {int(self.tree.nodes/time_elapse)} time {int(time_elapse*1000)}", flush=True)
+                    #time_elapse = time.time() - time_start
+                    #print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1} nodes {self.tree.nodes} nps {int(self.tree.nodes/time_elapse)} time {int(time_elapse*1000)}", flush=True)
+                    self.tree.print_info()
                 branch.gen_branches(target_depth)
 
                 if not self.tree.active:
@@ -379,6 +380,6 @@ def main():
             tree.active = False
 
 
-priority_med_fac = 0.8
-priority_low_fac = 0.5
+priority_med_fac = 0.85
+priority_low_fac = 0.65
 main()

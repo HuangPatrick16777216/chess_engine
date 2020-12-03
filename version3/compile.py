@@ -19,6 +19,7 @@ import os
 
 PARENT = os.path.realpath(os.path.dirname(__file__))
 files = (
+    "position.cpp",
     "funcs.cpp",
     "main.cpp",
 )

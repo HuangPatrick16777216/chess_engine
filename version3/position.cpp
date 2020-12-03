@@ -38,3 +38,43 @@ Position::Position() {
         {4,  2,  3,  5,  6,  3,  2,  4}
     };
 }
+
+
+string Position::print() {
+    string print_str;
+    string line_str, col_str;
+    line_str = " +---+---+---+---+---+---+---+---+\n";
+    col_str = " | ";
+
+    print_str += line_str;
+    for (auto row: _position) {
+        for (auto piece: row) {
+            print_str += col_str;
+            print_str += _piece_to_symbol(piece);
+        }
+        print_str += col_str;
+        print_str += "\n";
+        print_str += line_str;
+    }
+    return print_str;
+}
+
+
+string Position::_piece_to_symbol(int piece) {
+    switch (piece) {
+        case 0: return " ";
+        case 1: return "P";
+        case 2: return "N";
+        case 3: return "B";
+        case 4: return "R";
+        case 5: return "Q";
+        case 6: return "K";
+        case 11: return "p";
+        case 12: return "n";
+        case 13: return "b";
+        case 14: return "r";
+        case 15: return "q";
+        case 16: return "k";
+        default: return " ";
+    }
+}

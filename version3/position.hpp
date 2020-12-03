@@ -29,6 +29,9 @@ class Position {
         ~Position();
         Position();
 
+        string print();
+
     private:
         vector<vector<int>> _position;
+        string _piece_to_symbol(int);
 };

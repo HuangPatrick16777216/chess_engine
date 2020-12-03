@@ -15,7 +15,6 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from os import getloadavg
 import threading
 import time
 import chess

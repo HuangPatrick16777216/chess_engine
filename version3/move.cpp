@@ -32,4 +32,23 @@ Move::Move() {}
 Move::Move(vector<int> sq_start, vector<int> sq_end, string promotion) {
     _square_start = sq_start;
     _square_end = sq_end;
+    _promotion = _symbol_to_piece(promotion);
+}
+
+
+int Move::_symbol_to_piece(string symbol) {
+    if (symbol == "") return 0;
+    else if (symbol == "P") return 1;
+    else if (symbol == "N") return 2;
+    else if (symbol == "B") return 3;
+    else if (symbol == "R") return 4;
+    else if (symbol == "Q") return 5;
+    else if (symbol == "K") return 6;
+    else if (symbol == "p") return 11;
+    else if (symbol == "n") return 12;
+    else if (symbol == "b") return 13;
+    else if (symbol == "r") return 14;
+    else if (symbol == "q") return 15;
+    else if (symbol == "k") return 16;
+    return 0;
 }

@@ -32,5 +32,7 @@ class Move {
     private:
         vector<int> _square_start;
         vector<int> _square_end;
-        string promotion;
+        int _promotion;
+
+        int _symbol_to_piece(string);
 };

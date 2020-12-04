@@ -20,6 +20,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "move.hpp"
 using namespace std;
 
 
@@ -30,6 +31,7 @@ class Position {
         Position();
 
         string print();
+        void push(Move);
 
     private:
         vector<vector<int>> _position;

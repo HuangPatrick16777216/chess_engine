@@ -20,6 +20,7 @@
 #include <vector>
 #include <string>
 #include "position.hpp"
+#include "move.hpp"
 using namespace std;
 
 
@@ -55,6 +56,22 @@ string Position::print() {
         print_str += line_str;
     }
     return print_str;
+}
+
+void Position::push(Move move) {
+    vector<int> sq_start, sq_end;
+    int promo, piece_start, piece_end;
+
+    sq_start = move.get_start();
+    sq_end = move.get_end();
+    promo = move.get_promotion();
+
+    piece_start = _position[sq_start[0]][sq_start[1]];
+    piece_end = _position[sq_end[0]][sq_end[1]];
+
+    if (promo == 0) _position[sq_end[0]][sq_end[1]] = piece_start;
+    else _position[sq_end[0]][sq_end[1]] = promo;
+    _position[sq_start[0]][sq_start[1]] = 0;
 }
 
 string Position::_piece_to_symbol(int piece) {

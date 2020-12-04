@@ -25,7 +25,6 @@ using namespace std;
 
 Position::~Position() {}
 
-
 Position::Position() {
     _position = {
         {14, 12, 13, 15, 16, 13, 12, 14},
@@ -38,7 +37,6 @@ Position::Position() {
         {4,  2,  3,  5,  6,  3,  2,  4}
     };
 }
-
 
 string Position::print() {
     string print_str;
@@ -58,7 +56,6 @@ string Position::print() {
     }
     return print_str;
 }
-
 
 string Position::_piece_to_symbol(int piece) {
     switch (piece) {

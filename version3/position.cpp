@@ -103,3 +103,15 @@ string Position::_piece_to_symbol(int piece) {
         default: return " ";
     }
 }
+
+vector<int> Position::_get_king_pos(bool color) {
+    int piece;
+    if (color) piece = 6;
+    else piece = 16;
+
+    for (auto row = 0; row < 7; row++) {
+        for (auto col = 0; col < 7; col++) {
+            if (_position[row][col] == piece) return {row, col};
+        }
+    }
+}

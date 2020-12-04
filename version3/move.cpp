@@ -49,6 +49,21 @@ int Move::get_promotion() {
     return _promotion;
 }
 
+void Move::parse_uci(string uci) {
+}
+
+void Move::set_start(vector<int> square) {
+    _square_start = square;
+}
+
+void Move::set_end(vector<int> square) {
+    _square_end = square;
+}
+
+void Move::set_promotion(int promotion) {
+    _promotion = promotion;
+}
+
 int Move::_symbol_to_piece(string symbol) {
     if (symbol == "") return 0;
     else if (symbol == "P") return 1;
@@ -64,4 +79,54 @@ int Move::_symbol_to_piece(string symbol) {
     else if (symbol == "q") return 15;
     else if (symbol == "k") return 16;
     return 0;
+}
+
+string Move::_coords_to_square(vector<int> coords) {
+    int c1=coords[0], c2=coords[1];
+    string square="";
+
+    if (c2 == 0) square += "a";
+    else if (c2 == 1) square += "b";
+    else if (c2 == 2) square += "c";
+    else if (c2 == 3) square += "d";
+    else if (c2 == 4) square += "e";
+    else if (c2 == 5) square += "f";
+    else if (c2 == 6) square += "g";
+    else if (c2 == 7) square += "h";
+
+    if (c1 == 0) square += "8";
+    else if (c1 == 1) square += "7";
+    else if (c1 == 2) square += "6";
+    else if (c1 == 3) square += "5";
+    else if (c1 == 4) square += "4";
+    else if (c1 == 5) square += "3";
+    else if (c1 == 6) square += "2";
+    else if (c1 == 7) square += "1";
+
+    return square;
+}
+
+vector<int> Move::_square_to_coords(string square) {
+    string ch1=square.substr(0, 1), ch2=square.substr(1, 1);
+    vector<int> coords;
+
+    if (ch2 == "1") coords.push_back(7);
+    else if (ch2 == "2") coords.push_back(6);
+    else if (ch2 == "3") coords.push_back(5);
+    else if (ch2 == "4") coords.push_back(4);
+    else if (ch2 == "5") coords.push_back(3);
+    else if (ch2 == "6") coords.push_back(2);
+    else if (ch2 == "7") coords.push_back(1);
+    else if (ch2 == "8") coords.push_back(0);
+
+    if (ch1 == "a") coords.push_back(0);
+    else if (ch1 == "b") coords.push_back(1);
+    else if (ch1 == "c") coords.push_back(2);
+    else if (ch1 == "d") coords.push_back(3);
+    else if (ch1 == "e") coords.push_back(4);
+    else if (ch1 == "f") coords.push_back(5);
+    else if (ch1 == "g") coords.push_back(6);
+    else if (ch1 == "h") coords.push_back(7);
+
+    return coords;
 }

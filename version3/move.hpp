@@ -33,10 +33,17 @@ class Move {
         vector<int> get_end();
         int get_promotion();
 
+        void parse_uci(string);
+        void set_start(vector<int>);
+        void set_end(vector<int>);
+        void set_promotion(int);
+
     private:
         vector<int> _square_start;
         vector<int> _square_end;
         int _promotion;
 
         int _symbol_to_piece(string);
+        string _coords_to_square(vector<int>);
+        vector<int> _square_to_coords(string);
 };

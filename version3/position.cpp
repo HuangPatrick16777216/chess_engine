@@ -37,6 +37,7 @@ Position::Position() {
         {1,  1,  1,  1,  1,  1,  1,  1},
         {4,  2,  3,  5,  6,  3,  2,  4}
     };
+    _turn = true;
 }
 
 string Position::print() {
@@ -70,8 +71,12 @@ void Position::push(Move move) {
     piece_end = _position[sq_end[0]][sq_end[1]];
 
     if (promo == 0) _position[sq_end[0]][sq_end[1]] = piece_start;
-    else _position[sq_end[0]][sq_end[1]] = promo;
+    else {
+        if (_turn) _position[sq_end[0]][sq_end[1]] = promo;
+        else _position[sq_end[0]][sq_end[1]] = promo + 10;
+    }
     _position[sq_start[0]][sq_start[1]] = 0;
+    _turn = !_turn;
 }
 
 string Position::_piece_to_symbol(int piece) {

@@ -34,6 +34,7 @@ class Position {
         void push(Move);
 
     private:
+        bool _turn;
         vector<vector<int>> _position;
         string _piece_to_symbol(int);
 };

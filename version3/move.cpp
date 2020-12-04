@@ -50,6 +50,19 @@ int Move::get_promotion() {
 }
 
 void Move::parse_uci(string uci) {
+    string sq1=uci.substr(0, 2), sq2=uci.substr(2, 2);
+    int promotion;
+
+    _square_start = _square_to_coords(sq1);
+    _square_end = _square_to_coords(sq2);
+
+    if (uci.size() > 4) {
+        promotion = _symbol_to_piece(uci.substr(4, 1));
+        if (promotion >= 10) promotion -= 10;
+        _promotion = promotion;
+    } else {
+        _promotion = 0;
+    }
 }
 
 void Move::set_start(vector<int> square) {

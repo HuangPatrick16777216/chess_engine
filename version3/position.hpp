@@ -32,6 +32,7 @@ class Position {
 
         string print();
         void push(Move);
+        void push_uci(string);
 
     private:
         bool _turn;

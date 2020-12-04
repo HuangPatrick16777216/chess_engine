@@ -79,6 +79,12 @@ void Position::push(Move move) {
     _turn = !_turn;
 }
 
+void Position::push_uci(string uci) {
+    Move move;
+    move.parse_uci(uci);
+    push(move);
+}
+
 string Position::_piece_to_symbol(int piece) {
     switch (piece) {
         case 0: return " ";

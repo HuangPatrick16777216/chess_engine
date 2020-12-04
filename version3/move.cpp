@@ -23,11 +23,13 @@
 using namespace std;
 
 
-Move::~Move() {}
+Move::~Move() {
 
+}
 
-Move::Move() {}
+Move::Move() {
 
+}
 
 Move::Move(vector<int> sq_start, vector<int> sq_end, string promotion) {
     _square_start = sq_start;
@@ -35,6 +37,17 @@ Move::Move(vector<int> sq_start, vector<int> sq_end, string promotion) {
     _promotion = _symbol_to_piece(promotion);
 }
 
+vector<int> Move::get_start() {
+    return _square_start;
+}
+
+vector<int> Move::get_end() {
+    return _square_end;
+}
+
+int Move::get_promotion() {
+    return _promotion;
+}
 
 int Move::_symbol_to_piece(string symbol) {
     if (symbol == "") return 0;

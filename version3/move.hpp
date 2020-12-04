@@ -29,6 +29,10 @@ class Move {
         Move();
         Move(vector<int>, vector<int>, string="");
 
+        vector<int> get_start();
+        vector<int> get_end();
+        int get_promotion();
+
     private:
         vector<int> _square_start;
         vector<int> _square_end;

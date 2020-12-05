@@ -275,7 +275,6 @@ def evaluate(position: chess.Board):
         "Q": pieces.count("Q"), "q": pieces.count("q")
     }
 
-
     # Material
     material = 0
     material += pieces_remaining["P"] - pieces_remaining["p"]
@@ -283,53 +282,9 @@ def evaluate(position: chess.Board):
     material += 3 * (pieces_remaining["B"] - pieces_remaining["b"])
     material += 5 * (pieces_remaining["R"] - pieces_remaining["r"])
     material += 9 * (pieces_remaining["Q"] - pieces_remaining["q"])
-
-
-    # Center
-    inner_center = ("D4", "D5", "E4", "E5")
-    outer_center = ("C3", "C4", "C5", "C6", "D6", "E6", "F6", "F5", "F4", "F3", "E3", "D3")
-
-    white_inner = 0
-    black_inner = 0
-    white_outer = 0
-    black_outer = 0
-
-    for square in inner_center:
-        white_inner += len(position.attackers(chess.WHITE, getattr(chess, square)))
-        black_inner += len(position.attackers(chess.BLACK, getattr(chess, square)))
-    for square in outer_center:
-        white_outer += len(position.attackers(chess.WHITE, getattr(chess, square)))
-        black_outer += len(position.attackers(chess.BLACK, getattr(chess, square)))
-    center = 0
-    center += (white_inner + white_outer/4) / sum([pieces_remaining[x] for x in pieces_remaining if x.isupper()])
-    center -= (black_inner + black_outer/4) / sum([pieces_remaining[x] for x in pieces_remaining if x.islower()])
-    center /= 3
-
-
-    # Pawns
-    white_ranks = 0
-    white_total_pawns = 0
-    for i in range(64):
-        piece = position.piece_at(i)
-        if piece is not None and piece.symbol() == "P":
-            white_ranks += i // 8
-            white_total_pawns += 1
-    white_ranks /= white_total_pawns
-
-    black_ranks = 0
-    black_total_pawns = 0
-    for i in range(64):
-        piece = position.piece_at(i)
-        if piece is not None and piece.symbol() == "p":
-            black_ranks += 7 - (i // 8)
-            black_total_pawns += 1
-    black_ranks /= black_total_pawns
-
-    pawns = white_ranks - black_ranks
-    pawns /= 9
     
 
-    score = material + center + pawns
+    score = material
     return 100 * score
 
 
@@ -388,6 +343,6 @@ def main():
             tree.active = False
 
 
-priority_med_fac = 0.85
-priority_low_fac = 0.65
+priority_med_fac = 0.55
+priority_low_fac = 0.3
 main()

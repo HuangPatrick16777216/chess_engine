@@ -42,36 +42,17 @@ class Node:
             target_depth = int(target_depth * priority_med_fac)
         elif self.priority == 2:
             target_depth = int(target_depth * priority_low_fac)
+        elif self.priority == 3:
+            return
 
         if target_depth == self.depth + 1:
-            evals = []
             for i, move in enumerate(self.legal_moves):
                 new_board = deepcopy(self.position)
                 new_board.push(move)
                 new_node = Node(new_board, self.tree, self, self.depth+1)
                 self.branches.append(new_node)
-                evals.append((evaluate(new_board), i))
                 if not self.tree.active:
                     return
-
-            if len(evals) > 15:
-                evals = sorted(evals, key=lambda x: x[0])
-                if self.position.turn:
-                    evals = list(reversed(evals))
-
-                num_first = max(len(evals)//5, 4)
-                num_second = min(len(evals)//2, 11)
-                first_indexes = [x[1] for x in evals[:num_first]]
-                second_indexes = [x[1] for x in evals[num_first:num_second]]
-                third_indexes = [x[1] for x in evals[num_second:]]
-
-                for i, branch in enumerate(self.branches):
-                    if i in first_indexes:
-                        branch.priority = 0
-                    elif i in second_indexes:
-                        branch.priority = 1
-                    elif i in third_indexes:
-                        branch.priority = 2
 
             self.minimax()
             self.set_indefinite()
@@ -80,13 +61,41 @@ class Node:
             for i, data in enumerate(zip(self.branches, self.legal_moves)):
                 branch, move = data
                 if self.depth == 0:
-                    #time_elapse = time.time() - time_start
-                    #print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1} nodes {self.tree.nodes} nps {int(self.tree.nodes/time_elapse)} time {int(time_elapse*1000)}", flush=True)
-                    self.tree.print_info()
+                    time_elapse = time.time() - time_start
+                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i+1} nodes {self.tree.nodes} nps {int(self.tree.nodes/time_elapse)} time {int(time_elapse*1000)}", flush=True)
+                    #self.tree.print_info()
                 branch.gen_branches(target_depth)
 
                 if not self.tree.active:
                     return
+
+            if target_depth == self.depth + 3:
+                evals = []
+                for i, branch in enumerate(self.branches):
+                    evals.append((branch.get_best()[0], i))
+
+                if len(evals) > 15:
+                    evals = sorted(evals, key=lambda x: x[0])
+                    if self.position.turn:
+                        evals = list(reversed(evals))
+
+                    num_first = len(evals) // 4
+                    num_second = len(evals) // 3
+                    num_third = len(evals) // 6
+                    first_indexes = [x[1] for x in evals[:num_first]]
+                    second_indexes = [x[1] for x in evals[num_first:num_first+num_second]]
+                    third_indexes = [x[1] for x in evals[num_first+num_second:num_first+num_second+num_third]]
+                    fourth_indexes = [x[1] for x in evals[num_first+num_second+num_third:]]
+
+                    for i, branch in enumerate(self.branches):
+                        if i in first_indexes:
+                            branch.priority = 0
+                        elif i in second_indexes:
+                            branch.priority = 1
+                        elif i in third_indexes:
+                            branch.priority = 2
+                        elif i in fourth_indexes:
+                            branch.priority = 3
 
     def minimax(self):
         self.best_definite = True

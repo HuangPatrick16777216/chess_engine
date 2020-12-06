@@ -43,7 +43,7 @@ class Node:
         elif self.priority == 2:
             target_depth = int(target_depth * priority_low_fac)
         elif self.priority == 3:
-            return
+            target_depth = int(target_depth * priority_super_low_fac)
 
         if target_depth == self.depth + 1:
             for i, move in enumerate(self.legal_moves):
@@ -343,6 +343,7 @@ def main():
             tree.active = False
 
 
-priority_med_fac = 0.55
-priority_low_fac = 0.3
+priority_med_fac = 0.75
+priority_low_fac = 0.5
+priority_super_low_fac = 0.25
 main()

@@ -149,6 +149,13 @@ bool Position::_is_pin(vector<int> position, int direction) {
                 else if (_position[position[0]][col] == grid2) return true;
             }
         }
+    } else if (direction == 1 && position[1] == king_pos[1]) {
+        if (king_pos[0] < position[0]) {
+            for (auto row = position[0] + 1; row < 8; row++) {
+                if (_position[row][position[1]] == grid1) return true;
+                if (_position[row][position[1]] == grid2) return true;
+            }
+        }
     }
     
     return false;

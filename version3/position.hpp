@@ -25,7 +25,11 @@ using namespace std;
 
 
 class Position {
-    // 0=empty, 1=wp, 2=wn, 3=wb, 4=wr, 5=wq, 6=wk, 11=bp, 12=bn, 13=bb, 14=br, 15=bq, 16=bk
+    /*
+    ALL COORDS ARE (row, col)
+    0=empty, 1=wp, 2=wn, 3=wb, 4=wr, 5=wq, 6=wk, 11=bp, 12=bn, 13=bb, 14=br, 15=bq, 16=bk
+    0 = horizontal, 1 = vertical, 2 = positive slope diagonal, 3 = negative slope diagonal
+    */
     public:
         ~Position();
         Position();
@@ -41,4 +45,5 @@ class Position {
         string _piece_to_symbol(int);
 
         vector<int> _get_king_pos(bool);
+        bool _is_pin(vector<int>, int);
 };

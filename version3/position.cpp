@@ -115,3 +115,11 @@ vector<int> Position::_get_king_pos(bool color) {
         }
     }
 }
+
+bool Position::_is_pin(vector<int> position, int direction) {
+    int piece;
+    vector<int> king_pos;
+
+    piece = _position[position[0]][position[1]];
+    king_pos = _get_king_pos((1 <= piece <= 6));
+}

@@ -117,9 +117,39 @@ vector<int> Position::_get_king_pos(bool color) {
 }
 
 bool Position::_is_pin(vector<int> position, int direction) {
-    int piece;
+    int piece, grid1, grid2, diag1, diag2;
     vector<int> king_pos;
 
     piece = _position[position[0]][position[1]];
-    king_pos = _get_king_pos((1 <= piece <= 6));
+    if (piece == 0 || piece == 6 || piece == 16) return false;
+
+    if (1 <= piece <= 6) {
+        king_pos = _get_king_pos(true);
+        grid1 = 15;
+        grid2 = 14;
+        diag1 = 15;
+        diag2 = 13;
+    } else {
+        king_pos = _get_king_pos(false);
+        grid1 = 5;
+        grid2 = 4;
+        diag1 = 5;
+        diag2 = 3;
+    }
+
+    if (direction == 0 && position[0] == king_pos[0]) {
+        if (king_pos[1] < position[1]) {
+            for (auto col = position[1] + 1; col < 8; col++) {
+                if (_position[position[0]][col] == grid1) return true;
+                else if (_position[position[0]][col] == grid2) return true;
+            }
+        } else {
+            for (auto col = position[1] - 1; col >= 0; col--) {
+                if (_position[position[0]][col] == grid1) return true;
+                else if (_position[position[0]][col] == grid2) return true;
+            }
+        }
+    }
+    
+    return false;
 }

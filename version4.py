@@ -29,23 +29,48 @@ class Node:
 
         self.branches = []
         self.eval = None
+        self.best = None
+        self.best_definite = False
         self.tree.nodes += 1
 
     def gen_branches(self, target_depth):
+        self.best_definite = False
         if target_depth == self.depth + 1:
             for i, move in enumerate(self.position.generate_legal_moves()):
                 new_board = deepcopy(self.position)
                 new_board.push(move)
                 new_node = Node(new_board, self.depth + 1, self.tree)
                 self.branches.append((i, new_node))
+                if not self.tree.active:
+                    return
 
         elif target_depth > self.depth + 1:
             for branch in self.branches:
                 branch[1].gen_branches(target_depth)
+                if not self.tree.active:
+                    return
+
+    def minimax(self):
+        self.best_definite = True
+        if len(self.branches) == 0:
+            self.eval = evaluate(self.position)
+            self.best = None
+            return (self.eval, self.best)
+
+        if self.position.turn:
+            self.eval = float("inf")
+            self.best = None
+            for branch in self.branches:
+                eval_info = branch.minimax()
+
+
+def evaluate(position):
+    return 0
 
 
 class Tree:
     def init_vars(self):
+        self.active = True
         self.nodes = 0
         self.time_start = time.time()
 

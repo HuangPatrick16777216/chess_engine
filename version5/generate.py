@@ -24,7 +24,7 @@ import chess.engine
 
 engine_path = "/home/patrick/work/chess/engines/stockfish12"
 depth = 12
-total = 1000
+total = 100000
 
 final = []
 engine = chess.engine.SimpleEngine.popen_uci(engine_path)
@@ -36,7 +36,7 @@ for i in range(total):
     time_elapse = time.time() - time_start
     elapse_msg = str(int(time_elapse*100)/100)
     remain_msg = str(int(time_elapse/(i+1)*(total-i)*100)/100)
-    msg = f"{i+1} of {total}; {elapse_msg}{' ' * (7-len(elapse_msg))} elapsed; {remain_msg}{' ' * (7-len(remain_msg))} remaining"
+    msg = f"{i+1} of {total};   {elapse_msg}{' ' * (7-len(elapse_msg))} elapsed;   {remain_msg}{' ' * (7-len(remain_msg))} remaining"
     sys.stdout.write(msg)
     sys.stdout.flush()
     sys.stdout.write("\b" * len(msg))
@@ -52,9 +52,11 @@ for i in range(total):
         board.push(random.choice(legal_moves))
 
     evaluation = engine.analyse(board, chess.engine.Limit(depth=depth))["score"].pov(chess.WHITE)
-    final.append((board.fen(), evaluation))
+    final.append((board.fen(), str(evaluation)))
 
-sys.stdout.write(f"finished in {int((time.time()-time_start) * 100) / 100} seconds.")
+sys.stdout.write(f"finished in {int((time.time()-time_start) * 100) / 100} seconds.\n")
 sys.stdout.flush()
+engine.quit()
 
-#for i in final: print(i)
+with open("data", "wb") as file:
+    pickle.dump(final, file)

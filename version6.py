@@ -20,6 +20,16 @@ import threading
 import chess
 
 
+class Node:
+    def __init__(self, position, depth, tree):
+        self.position = position
+        self.depth = depth
+        self.tree = tree
+        self.branches = []
+
+        tree.nodes += 1
+
+
 class Tree:
     def init_vars(self):
         self.active = True
@@ -31,6 +41,7 @@ class Tree:
     def search(self, **kwargs):
         self.init_vars()
         position = kwargs["position"]
+        self.root = Node(position, 0, self)
 
 
 def main():

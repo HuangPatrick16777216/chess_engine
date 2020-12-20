@@ -18,16 +18,34 @@
 import time
 import threading
 import chess
+from copy import deepcopy
 
 
 class Node:
-    def __init__(self, position, depth, tree):
+    def __init__(self, position: chess.Board, depth, tree):
         self.position = position
         self.depth = depth
         self.tree = tree
         self.branches = []
 
         tree.nodes += 1
+
+    def gen_branches(self, target_depth):
+        if target_depth == self.depth + 1:
+            for move in self.position.generate_legal_moves():
+                new_board = deepcopy(self.position)
+                new_board.push(move)
+                new_node = Node(new_board, self.depth+1, self.tree)
+                self.branches.append(new_node)
+
+        elif target_depth > self.depth + 1:
+            if self.depth == 0:
+                for i, move, branch in zip(range(len(self.branches)), list(self.position.generate_legal_moves()), self.branches):
+                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i}", flush=True)
+                    branch.gen_branches(target_depth)
+            else:
+                for branch in self.branches:
+                    branch.gen_branches(target_depth)
 
 
 class Tree:
@@ -42,6 +60,9 @@ class Tree:
         self.init_vars()
         position = kwargs["position"]
         self.root = Node(position, 0, self)
+
+        for depth in range(100):
+            self.root.gen_branches(depth)
 
 
 def main():
@@ -94,3 +115,6 @@ def main():
             threading.Thread(target=tree.search, kwargs=kwargs).start()
         elif msg == "stop":
             tree.active = False
+
+
+main()

@@ -15,12 +15,27 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-import chess
+import time
 import threading
+import chess
+
+
+class Tree:
+    def init_vars(self):
+        self.active = True
+        self.nodes = 0
+        self.bestmove = None
+        self.eval = 0
+        self.time_start = time.time()
+
+    def search(self, **kwargs):
+        self.init_vars()
+        position = kwargs["position"]
 
 
 def main():
     position = chess.Board()
+    tree = Tree()
 
     while True:
         msg = input().strip()

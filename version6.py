@@ -30,13 +30,18 @@ class Node:
 
         tree.nodes += 1
         self.eval = evaluate(position)
-        self.priority = None
+        self.priority = "HIGH"
         self.best_definite = False
 
     def gen_branches(self, target_depth):
         self.best_definite = False
         if not self.tree.active:
             return
+
+        if self.priority == "MED":
+            target_depth = int(target_depth * MED_FAC)
+        elif self.priority == "LOW":
+            target_depth = int(target_depth * LOW_SPEED)
 
         if target_depth == self.depth + 1:
             for move in self.position.generate_legal_moves():
@@ -61,7 +66,7 @@ class Node:
     def minimax(self):
         if self.best_definite:
             return (self.eval, self.best)
-            
+
         self.best_definite = True
         if len(self.branches) == 0:
             prev_move = None if len(self.position.move_stack) == 0 else self.position.peek()
@@ -79,7 +84,7 @@ class Node:
             best_move = None
             best_ind = 0
             for i, branch in enumerate(self.branches):
-                evaluation = branch.get_best()[0]
+                evaluation = branch.minimax()[0]
                 if evaluation > max_eval:
                     max_eval = evaluation
                     best_move = branch.position.peek()
@@ -94,7 +99,7 @@ class Node:
             best_move = None
             best_ind = 0
             for i, branch in enumerate(self.branches):
-                evaluation = branch.get_best()[0]
+                evaluation = branch.minimax()[0]
                 if evaluation < min_eval:
                     min_eval = evaluation
                     best_move = branch.position.peek()
@@ -105,7 +110,23 @@ class Node:
             return (self.eval, self.best)
             
     def prioritize(self):
-        pass
+        length = len(self.branches)
+        if not length > 15:
+            return
+
+        evals = [(b, b.minimax()[0]) for b in self.branches]
+        evals = sorted(evals, key=(lambda x: x[1]))
+        if self.position.turn:
+            evals = reversed(evals)
+        
+        split1 = int(length*HIGH_FAC)
+        split2 = int(length*HIGH_FAC + length*MED_FAC)
+        for branch in self.branches[:split1]:
+            branch.priority = "HIGH"
+        for branch in self.branches[split1:split2]:
+            branch.priority = "MED"
+        for branch in self.branches[split2:]:
+            branch.priority = "LOW"
 
 
 class Tree:
@@ -222,4 +243,8 @@ def main():
             tree.active = False
 
 
+HIGH_FAC = 0.3
+MED_FAC = 0.3
+MED_SPEED = 0.7
+LOW_SPEED = 0.3
 main()

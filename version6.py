@@ -53,6 +53,11 @@ class Node:
             else:
                 for branch in self.branches:
                     branch.gen_branches(target_depth)
+            if target_depth == self.depth + 3:
+                self.prioritize()
+            
+    def prioritize(self):
+        pass
 
 
 class Tree:

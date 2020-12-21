@@ -31,6 +31,9 @@ class Node:
         tree.nodes += 1
 
     def gen_branches(self, target_depth):
+        if not self.tree.active:
+            return
+
         if target_depth == self.depth + 1:
             for move in self.position.generate_legal_moves():
                 new_board = deepcopy(self.position)
@@ -41,7 +44,8 @@ class Node:
         elif target_depth > self.depth + 1:
             if self.depth == 0:
                 for i, move, branch in zip(range(len(self.branches)), list(self.position.generate_legal_moves()), self.branches):
-                    print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i}", flush=True)
+                    if self.tree.active:
+                        print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i}", flush=True)
                     branch.gen_branches(target_depth)
             else:
                 for branch in self.branches:
@@ -73,6 +77,7 @@ def main():
         msg = input().strip()
 
         if msg == "quit":
+            tree.active = False
             return
         elif msg == "isready":
             print("readyok", flush=True)

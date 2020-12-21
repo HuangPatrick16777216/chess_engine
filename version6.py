@@ -55,6 +55,49 @@ class Node:
                     branch.gen_branches(target_depth)
             if target_depth == self.depth + 3:
                 self.prioritize()
+    
+    def minimax(self):
+        self.best_definite = True
+        if len(self.branches) == 0:
+            prev_move = None if len(self.position.move_stack) == 0 else self.position.peek()
+            self.eval = evaluate(self.position)
+            if self.eval == float("inf"):
+                self.eval = 16777216 - self.depth
+            elif self.eval == float("-inf"):
+                self.eval = -16777216 + self.depth
+
+            self.best = [prev_move]
+            return (self.eval, self.best)
+
+        if self.position.turn:
+            max_eval = float("-inf")
+            best_move = None
+            best_ind = 0
+            for i, branch in enumerate(self.branches):
+                evaluation = branch.get_best()[0]
+                if evaluation > max_eval:
+                    max_eval = evaluation
+                    best_move = branch.position.peek()
+                    best_ind = i
+
+            self.eval = max_eval
+            self.best = [best_move] + self.branches[best_ind].best
+            return (max_eval, best_move)
+
+        else:
+            min_eval = float("inf")
+            best_move = None
+            best_ind = 0
+            for i, branch in enumerate(self.branches):
+                evaluation = branch.get_best()[0]
+                if evaluation < min_eval:
+                    min_eval = evaluation
+                    best_move = branch.position.peek()
+                    best_ind = i
+
+            self.eval = min_eval
+            self.best = [best_move] + self.branches[best_ind].best
+            return (min_eval, best_move)
             
     def prioritize(self):
         pass

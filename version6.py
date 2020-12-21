@@ -31,8 +31,10 @@ class Node:
         tree.nodes += 1
         self.eval = evaluate(position)
         self.priority = None
+        self.best_definite = False
 
     def gen_branches(self, target_depth):
+        self.best_definite = False
         if not self.tree.active:
             return
 
@@ -57,6 +59,9 @@ class Node:
                 self.prioritize()
     
     def minimax(self):
+        if self.best_definite:
+            return (self.eval, self.best)
+            
         self.best_definite = True
         if len(self.branches) == 0:
             prev_move = None if len(self.position.move_stack) == 0 else self.position.peek()
@@ -82,7 +87,7 @@ class Node:
 
             self.eval = max_eval
             self.best = [best_move] + self.branches[best_ind].best
-            return (max_eval, best_move)
+            return (self.eval, self.best)
 
         else:
             min_eval = float("inf")
@@ -97,7 +102,7 @@ class Node:
 
             self.eval = min_eval
             self.best = [best_move] + self.branches[best_ind].best
-            return (min_eval, best_move)
+            return (self.eval, self.best)
             
     def prioritize(self):
         pass

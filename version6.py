@@ -47,7 +47,8 @@ class Node:
             if self.depth == 0:
                 for i, move, branch in zip(range(len(self.branches)), list(self.position.generate_legal_moves()), self.branches):
                     if self.tree.active:
-                        print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i}", flush=True)
+                        #print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i}", flush=True)
+                        self.tree.print_info()
                     branch.gen_branches(target_depth)
             else:
                 for branch in self.branches:
@@ -55,11 +56,14 @@ class Node:
 
 
 class Tree:
+    info_str = "info depth {depth} seldepth {seldepth} multipv 1 score {score} nodes {nodes} nps {nps} tbhits 0 time {time} pv {moves}"
+
     def init_vars(self):
         self.active = True
         self.nodes = 0
-        self.bestmove = None
         self.eval = 0
+        self.depth = 0
+        self.bestmove = None
         self.time_start = time.time()
 
     def search(self, **kwargs):
@@ -68,7 +72,14 @@ class Tree:
         self.root = Node(position, 0, self)
 
         for depth in range(100):
+            self.depth = depth
             self.root.gen_branches(depth)
+
+    def print_info(self):
+        time_elapse = time.time() - self.time_start
+        print_str = self.info_str.format(depth=self.depth, seldepth=self.depth, score=self.eval, nodes=self.nodes,
+            nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=None)
+        print(print_str, flush=True)
 
 
 def evaluate(position):

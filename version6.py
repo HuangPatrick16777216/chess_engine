@@ -29,6 +29,8 @@ class Node:
         self.branches = []
 
         tree.nodes += 1
+        self.eval = evaluate(position)
+        self.priority = None
 
     def gen_branches(self, target_depth):
         if not self.tree.active:

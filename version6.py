@@ -69,6 +69,40 @@ class Tree:
             self.root.gen_branches(depth)
 
 
+def evaluate(position):
+    if position.is_game_over():
+        result = position.result()
+        if result == "1-0":
+            return float("inf")
+        elif result == "0-1":
+            return float("-inf")
+        elif result == "1/2-1/2":
+            return 0
+
+    
+    # General
+    pieces = position.fen().split(" ")[0]
+    pieces_remaining = {
+        "P": pieces.count("P"), "p": pieces.count("p"),
+        "N": pieces.count("N"), "n": pieces.count("n"),
+        "B": pieces.count("B"), "b": pieces.count("b"),
+        "R": pieces.count("R"), "r": pieces.count("r"),
+        "Q": pieces.count("Q"), "q": pieces.count("q")
+    }
+
+    # Material
+    material = 0
+    material += pieces_remaining["P"] - pieces_remaining["p"]
+    material += 3 * (pieces_remaining["N"] - pieces_remaining["n"])
+    material += 3 * (pieces_remaining["B"] - pieces_remaining["b"])
+    material += 5 * (pieces_remaining["R"] - pieces_remaining["r"])
+    material += 9 * (pieces_remaining["Q"] - pieces_remaining["q"])
+    
+
+    score = material
+    return 100 * score
+
+
 def main():
     position = chess.Board()
     tree = Tree()

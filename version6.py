@@ -54,7 +54,7 @@ class Node:
             if self.depth == 0:
                 for i, move, branch in zip(range(len(self.branches)), list(self.position.generate_legal_moves()), self.branches):
                     if self.tree.active:
-                        #print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i}", flush=True)
+                        print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i}", flush=True)
                         self.tree.print_info()
                     branch.gen_branches(target_depth)
             else:
@@ -70,7 +70,6 @@ class Node:
         self.best_definite = True
         if len(self.branches) == 0:
             prev_move = None if len(self.position.move_stack) == 0 else self.position.peek()
-            self.eval = evaluate(self.position)
             if self.eval == float("inf"):
                 self.eval = 16777216 - self.depth
             elif self.eval == float("-inf"):
@@ -114,19 +113,26 @@ class Node:
         if not length > 15:
             return
 
-        evals = [(b, b.minimax()[0]) for b in self.branches]
+        evals = [(b, b.minimax()[0], i) for i, b in enumerate(self.branches)]
         evals = sorted(evals, key=(lambda x: x[1]))
         if self.position.turn:
             evals = reversed(evals)
         
         split1 = int(length*HIGH_FAC)
         split2 = int(length*HIGH_FAC + length*MED_FAC)
-        for branch in self.branches[:split1]:
-            branch.priority = "HIGH"
-        for branch in self.branches[split1:split2]:
-            branch.priority = "MED"
-        for branch in self.branches[split2:]:
-            branch.priority = "LOW"
+        high, med, low = [], [], []
+        for i in range(length):
+            if i < split1:
+                high.append(i)
+            else:
+                med.append(i) if i < split2 else low.append(i)
+
+        for i in high:
+            self.branches[i].priority = "HIGH"
+        for i in med:
+            self.branches[i].priority = "MED"
+        for i in low:
+            self.branches[i].priority = "LOW"
 
 
 class Tree:

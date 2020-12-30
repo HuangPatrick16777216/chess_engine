@@ -32,14 +32,15 @@ string strip(string str) {
 
 
 vector<string> split(string str) {
+    // todo debug function
     vector<string> final;
     string curr_char;
     int start;
-    bool state=false;
+    bool state=false;  // true if in space
 
     for (auto i = 0; i < str.size(); i++) {
         curr_char = str.substr(i, 1);
-        
+
         if (state && curr_char != " ") {
             state = false;
             start = i;
@@ -48,5 +49,6 @@ vector<string> split(string str) {
             final.push_back(str.substr(start, i-start));
         }
     }
+    final.push_back(str.substr(start, str.size()-start));
     return final;
 }

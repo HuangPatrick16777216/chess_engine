@@ -32,5 +32,21 @@ string strip(string str) {
 
 
 vector<string> split(string str) {
+    vector<string> final;
+    string curr_char;
+    int start;
+    bool state=false;
 
+    for (auto i = 0; i < str.size(); i++) {
+        curr_char = str.substr(i, 1);
+        
+        if (state && curr_char != " ") {
+            state = false;
+            start = i;
+        } else if (!state && curr_char == " ") {
+            state = true;
+            final.push_back(str.substr(start, i-start));
+        }
+    }
+    return final;
 }

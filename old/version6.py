@@ -54,7 +54,7 @@ class Node:
             if self.depth == 0:
                 for i, move, branch in zip(range(len(self.branches)), list(self.position.generate_legal_moves()), self.branches):
                     if self.tree.active:
-                        print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i}", flush=True)
+                        #print(f"info depth {target_depth} currmove {move.uci()} currmovenumber {i}", flush=True)
                         self.tree.print_info()
                     branch.gen_branches(target_depth)
             else:
@@ -75,6 +75,7 @@ class Node:
             elif self.eval == float("-inf"):
                 self.eval = -16777216 + self.depth
 
+            self.eval = evaluate(self.position)
             self.best = [prev_move]
             return (self.eval, self.best)
 
@@ -116,7 +117,9 @@ class Node:
         evals = [(b, b.minimax()[0], i) for i, b in enumerate(self.branches)]
         evals = sorted(evals, key=(lambda x: x[1]))
         if self.position.turn:
-            evals = reversed(evals)
+            evals = list(reversed(evals))
+        #if self.depth == 0:
+            #print(evals)
         
         split1 = int(length*HIGH_FAC)
         split2 = int(length*HIGH_FAC + length*MED_FAC)
@@ -156,6 +159,7 @@ class Tree:
             self.root.gen_branches(depth)
 
     def print_info(self):
+        self.eval = self.root.minimax()[0]
         time_elapse = time.time() - self.time_start
         print_str = self.info_str.format(depth=self.depth, seldepth=self.depth, score=self.eval, nodes=self.nodes,
             nps=int(self.nodes/time_elapse), time=int(time_elapse*1000), moves=None)

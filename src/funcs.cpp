@@ -35,11 +35,11 @@ vector<string> split(string str) {
     // todo debug function
     vector<string> final;
     string curr_char;
-    int start;
+    int start=0;
     bool state=false;  // true if in space
 
     for (auto i = 0; i < str.size(); i++) {
-        curr_char = str.substr(i, 1);
+        curr_char = str.at(i);
 
         if (state && curr_char != " ") {
             state = false;

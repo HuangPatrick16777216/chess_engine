@@ -26,7 +26,10 @@ def main():
     tree = Tree()
 
     while True:
-        msg = input().strip()
+        try:
+            msg = input().strip()
+        except EOFError:
+            return
 
         if msg == "quit":
             tree.active = False

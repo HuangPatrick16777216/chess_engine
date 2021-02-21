@@ -17,3 +17,56 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import chess
+
+
+def main():
+    board = chess.Board()
+
+    while True:
+        msg = input().strip()
+
+        if msg == "quit":
+            #tree.active = False
+            return
+        elif msg == "isready":
+            print("readyok", flush=True)
+        elif msg == "uci":
+            print("uciok", flush=True)
+        elif msg == "d":
+            print(position, flush=True)
+
+        elif msg == "ucinewgame":
+            position = chess.Board()
+        elif msg.startswith("position"):
+            msg = msg.replace("position", "").strip()
+            if msg.startswith("startpos"):
+                msg = msg.replace("startpos", "").strip()
+                position = chess.Board()
+                if msg.startswith("moves"):
+                    moves = msg.replace("moves", "").strip().split(" ")
+                    for move in moves:
+                        position.push_uci(move)
+
+            elif msg.startswith("fen"):
+                fen = msg.replace("fen", "").strip()
+                position = chess.Board(fen)
+
+        elif msg.startswith("go"):
+            msg = msg.replace("go", "").strip()
+            kwargs = {"position": position}
+
+            if msg.startswith("nodes"):
+                kwargs["nodes"] = int(msg.replace("nodes", "").strip())
+            elif msg.startswith("depth"):
+                kwargs["depth"] = int(msg.replace("depth", "").strip())
+            elif msg.startswith("movetime"):
+                kwargs["movetime"] = int(msg.replace("movetime", "").strip())
+            elif "wtime" in msg or "btime" in msg:
+                parts = msg.split(" ")
+                for i in range(0, len(parts)//2):
+                    kwargs[parts[i*2]] = int(parts[i*2+1]) / 1000
+
+        elif msg == "stop":
+            #tree.active = False
+            pass

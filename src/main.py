@@ -18,43 +18,45 @@
 #
 
 import chess
+from tree import Tree
 
 
 def main():
     board = chess.Board()
+    tree = Tree()
 
     while True:
         msg = input().strip()
 
         if msg == "quit":
-            #tree.active = False
+            tree.active = False
             return
         elif msg == "isready":
             print("readyok", flush=True)
         elif msg == "uci":
             print("uciok", flush=True)
         elif msg == "d":
-            print(position, flush=True)
+            print(board, flush=True)
 
         elif msg == "ucinewgame":
-            position = chess.Board()
+            board = chess.Board()
         elif msg.startswith("position"):
             msg = msg.replace("position", "").strip()
             if msg.startswith("startpos"):
                 msg = msg.replace("startpos", "").strip()
-                position = chess.Board()
+                board = chess.Board()
                 if msg.startswith("moves"):
                     moves = msg.replace("moves", "").strip().split(" ")
                     for move in moves:
-                        position.push_uci(move)
+                        board.push_uci(move)
 
             elif msg.startswith("fen"):
                 fen = msg.replace("fen", "").strip()
-                position = chess.Board(fen)
+                board = chess.Board(fen)
 
         elif msg.startswith("go"):
             msg = msg.replace("go", "").strip()
-            kwargs = {"position": position}
+            kwargs = {"board": board}
 
             if msg.startswith("nodes"):
                 kwargs["nodes"] = int(msg.replace("nodes", "").strip())
@@ -67,6 +69,7 @@ def main():
                 for i in range(0, len(parts)//2):
                     kwargs[parts[i*2]] = int(parts[i*2+1]) / 1000
 
+            tree.go(**kwargs)
+
         elif msg == "stop":
-            #tree.active = False
-            pass
+            tree.active = False

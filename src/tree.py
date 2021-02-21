@@ -53,12 +53,12 @@ class Tree:
         while self.active:
             elapse = time.time() - self.time_start
             string = self.print_str.format(self.depth, self.depth, self.root.eval, self.nodes,
-                int(self.nodes/elapse), int(elapse*1000), self.root.best)
+                int(self.nodes/elapse), int(elapse*1000), self.root.move)
             print(string, flush=True)
-            time.sleep(1)
+            time.sleep(0.1)
 
     def print_best(self):
-        print(f"bestmove {self.root.best}", flush=True)
+        print(f"bestmove {self.root.move}", flush=True)
 
 
 class Node:
@@ -69,11 +69,14 @@ class Node:
         self.children = []
 
         self.eval = evaluate(board)
-        self.best = None
+        self.move = None
 
     def branch(self, target_depth):
         if target_depth == self.depth+1:
             for move in self.board.generate_legal_moves():
+                if not self.tree.active:
+                    return
+
                 new_board = deepcopy(self.board)
                 new_board.push(move)
                 new_node = Node(self.board, self.depth+1, self.tree)
@@ -83,4 +86,34 @@ class Node:
 
         elif target_depth > self.depth+1:
             for c in self.children:
+                if not self.tree.active:
+                    return
                 c.branch(target_depth)
+
+    def minimax(self):
+        if len(self.children) == 0:
+            return (self.eval, self.board.peek())
+
+        if self.board.turn:
+            best_ind = 0
+            for i, c in enumerate(self.children):
+                if c.eval > self.children[best_ind].eval:
+                    best_ind = i
+
+            best_eval = self.children[best_ind].eval
+            best_move = self.children[best_ind].board.peek()
+            self.eval = best_eval
+            self.move = best_move
+            return (best_eval, best_move)
+
+        else:
+            best_ind = 0
+            for i, c in enumerate(self.children):
+                if c.eval < self.children[best_ind].eval:
+                    best_ind = i
+
+            best_eval = self.children[best_ind].eval
+            best_move = self.children[best_ind].board.peek()
+            self.eval = best_eval
+            self.move = best_move
+            return (best_eval, best_move)

@@ -18,25 +18,45 @@
 #
 
 import time
+import threading
 import chess
 from copy import deepcopy
 
 
 class Tree:
+    print_str = "info depth {} seldepth {} multipv 1 score {} nodes {} nps {} tbhits 0 time {} pv {}"
+
     def __init__(self):
         self.init_vars(chess.Board())
 
     def init_vars(self, board):
-        self.active = False
+        self.active = True
         self.board = board
         self.nodes = 0
+        self.depth = 0
         self.time_start = time.time()
 
     def go(self, **kwargs):
         self.init_vars(kwargs["board"])
         self.root = Node(kwargs["board"], 0, self)
+        threading.Thread(target=self.printer).start()
+
         for depth in range(4):
+            self.depth = depth
             self.root.branch(depth)
+
+        self.active = False
+        self.print_best()
+
+    def printer(self):
+        while self.active:
+            elapse = time.time() - self.time_start
+            string = self.print_str.format(self.depth, self.depth, self.root.eval, self.nodes,
+                int(self.nodes/elapse), int(elapse*1000), self.root.best)
+            print(string, flush=True)
+
+    def print_best(self):
+        print(f"bestmove {self.root.best}", flush=True)
 
 
 class Node:
@@ -45,6 +65,9 @@ class Node:
         self.depth = depth
         self.tree = tree
         self.children = []
+
+        self.eval = None
+        self.best = None
 
     def branch(self, target_depth):
         if target_depth == self.depth+1:

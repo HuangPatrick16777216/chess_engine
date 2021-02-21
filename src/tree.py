@@ -21,6 +21,7 @@ import time
 import threading
 import chess
 from copy import deepcopy
+from eval import evaluate
 
 
 class Tree:
@@ -54,19 +55,20 @@ class Tree:
             string = self.print_str.format(self.depth, self.depth, self.root.eval, self.nodes,
                 int(self.nodes/elapse), int(elapse*1000), self.root.best)
             print(string, flush=True)
+            time.sleep(1)
 
     def print_best(self):
         print(f"bestmove {self.root.best}", flush=True)
 
 
 class Node:
-    def __init__(self, board, depth, tree):
+    def __init__(self, board: chess.Board, depth, tree: Tree):
         self.board = board
         self.depth = depth
         self.tree = tree
         self.children = []
 
-        self.eval = None
+        self.eval = evaluate(board)
         self.best = None
 
     def branch(self, target_depth):

@@ -17,6 +17,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+import threading
 import chess
 from tree import Tree
 
@@ -72,7 +73,7 @@ def main():
                 for i in range(0, len(parts)//2):
                     kwargs[parts[i*2]] = int(parts[i*2+1]) / 1000
 
-            tree.go(**kwargs)
+            threading.Thread(target=tree.go, kwargs=kwargs).start()
 
         elif msg == "stop":
             tree.active = False

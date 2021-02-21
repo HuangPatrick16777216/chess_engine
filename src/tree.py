@@ -47,7 +47,7 @@ class Node:
         self.children = []
 
     def branch(self, target_depth):
-        if self.depth+1 == target_depth:
+        if target_depth == self.depth+1:
             for move in self.board.generate_legal_moves():
                 new_board = deepcopy(self.board)
                 new_board.push(move)
@@ -55,3 +55,7 @@ class Node:
 
                 self.children.append(new_node)
                 self.tree.nodes += 1
+
+        elif target_depth > self.depth+1:
+            for c in self.children:
+                c.branch(target_depth)

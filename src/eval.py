@@ -28,10 +28,10 @@ def evaluate(board: chess.Board):
     material += 3 * len(board.pieces(chess.BISHOP, chess.WHITE))
     material += 5 * len(board.pieces(chess.ROOK, chess.WHITE))
     material += 9 * len(board.pieces(chess.QUEEN, chess.WHITE))
-    material -= len(board.pieces(chess.PAWN, chess.WHITE))
-    material -= 3 * len(board.pieces(chess.KNIGHT, chess.WHITE))
-    material -= 3 * len(board.pieces(chess.BISHOP, chess.WHITE))
-    material -= 5 * len(board.pieces(chess.ROOK, chess.WHITE))
-    material -= 9 * len(board.pieces(chess.QUEEN, chess.WHITE))
+    material -= len(board.pieces(chess.PAWN, chess.BLACK))
+    material -= 3 * len(board.pieces(chess.KNIGHT, chess.BLACK))
+    material -= 3 * len(board.pieces(chess.BISHOP, chess.BLACK))
+    material -= 5 * len(board.pieces(chess.ROOK, chess.BLACK))
+    material -= 9 * len(board.pieces(chess.QUEEN, chess.BLACK))
 
     return material

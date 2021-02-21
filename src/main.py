@@ -73,3 +73,6 @@ def main():
 
         elif msg == "stop":
             tree.active = False
+
+
+main()
